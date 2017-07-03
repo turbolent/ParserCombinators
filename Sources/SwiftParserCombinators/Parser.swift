@@ -46,7 +46,7 @@ class Parser<T, Input: Reader> {
         }
     }
 
-    // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+    // NOTE: unfortunately it is not possible in Swift to constrain U to be a supertype of T
     func append<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
         let lazyNext = Lazy(next)
         return Parser<U, Input> { input in
@@ -54,7 +54,7 @@ class Parser<T, Input: Reader> {
         }
     }
     
-    // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+    // NOTE: unfortunately it is not possible in Swift to constrain U to be a supertype of T
     func or<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
         return append(next())
     }
@@ -96,7 +96,7 @@ func char<Input>(_ char: Character) -> Parser<Character, Input>
     return accept(element: char)
 }
 
-// NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+// NOTE: unfortunately it is not possible in Swift to constrain U to be a supertype of T
 func | <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                      rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
 

@@ -1,8 +1,6 @@
 
 struct StringReader: Reader {
 
-    typealias Element = Character
-
     let characters: String.CharacterView
     let index: String.CharacterView.Index
 
