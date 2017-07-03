@@ -1,0 +1,138 @@
+
+// NOTE: could be just `typealias Parser<T, Input: Reader> = (Input) -> ParseResult<T, Input>`
+// but wouldn't allow providing chaining methods
+
+class Parser<T, Input: Reader> {
+    typealias Result = ParseResult<T, Input>
+
+    let parse: (Input) -> Result
+
+    init(f: @escaping (Input) -> Result) {
+        self.parse = f
+    }
+
+    func map<U>(_ f: @escaping (T) -> U) -> Parser<U, Input> {
+        return Parser<U, Input> { input in
+            self.parse(input).map(f)
+        }
+    }
+
+    func flatMap<U>(_ f: @escaping (T) -> Parser<U, Input>) -> Parser<U, Input> {
+        return Parser<U, Input> { input in
+            self.parse(input).flatMapWithNext(f)
+        }
+    }
+
+    func seq<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+        // TODO: make lazy
+        let p = next()
+        return flatMap { firstResult in
+            p.map { secondResult in
+                (firstResult, secondResult)
+            }
+        }
+    }
+
+    func seqIgnoreLeft<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+        // TODO: make lazy
+        let p = next()
+        return flatMap { _ in p }
+    }
+
+    func seqIgnoreRight<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<T, Input> {
+        // TODO: make lazy
+        let p = next()
+        return flatMap { firstResult in
+            p.map { _ in
+                firstResult
+            }
+        }
+    }
+
+    // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+    func append<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+        // TODO: make lazy
+        let p = next()
+        return Parser<U, Input> { input in
+            self.parse(input).append(p.parse(input))
+        }
+    }
+    
+    // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+    func or<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+        return append(next())
+    }
+}
+
+
+func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
+                     errorMessageSupplier: @escaping (Input.Element) -> String)
+    -> Parser<Input.Element, Input>
+{
+    return Parser { input in
+        guard !input.atEnd else {
+            return .failure(message: "end of input", remaining: input)
+        }
+
+        let element = input.first
+
+        guard predicate(element) else {
+            let message = errorMessageSupplier(element)
+            return .failure(message: message, remaining: input)
+        }
+
+        return .success(value: element,
+                        remaining: input.rest)
+    }
+}
+
+func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input>
+    where Input.Element: Equatable
+{
+    return acceptIf(predicate: { $0 == element },
+                    errorMessageSupplier: { e in "expected \(element) but found \(e)" })
+}
+
+
+func char<Input>(_ char: Character) -> Parser<Character, Input>
+    where Input.Element == Character
+{
+    return accept(element: char)
+}
+
+// NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
+func | <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                     rhs: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+
+    return lhs().or(rhs())
+}
+
+infix operator ~ {
+    associativity left
+}
+
+func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                     rhs: @autoclosure () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+    return lhs().seq(rhs())
+}
+
+
+infix operator ~> {
+    associativity left
+}
+
+func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                      rhs: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+    return lhs().seqIgnoreLeft(rhs())
+}
+
+
+infix operator <~ {
+    associativity left
+}
+
+func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                      rhs: @autoclosure () -> Parser<U, Input>) -> Parser<T, Input> {
+    return lhs().seqIgnoreRight(rhs())
+}
+
