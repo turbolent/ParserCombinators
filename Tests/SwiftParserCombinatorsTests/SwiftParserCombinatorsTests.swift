@@ -123,7 +123,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
         ("testOrFirst", testOrFirst),
-        ("testOrAlternative", testOrAlternative)
+        ("testOrAlternative", testOrAlternative),
         ("testOrFirstSuccess", testOrFirstSuccess)
     ]
 }

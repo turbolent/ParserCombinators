@@ -23,43 +23,39 @@ class Parser<T, Input: Reader> {
         }
     }
 
-    func seq<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<(T, U), Input> {
-        // TODO: make lazy
-        let p = next()
+    func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+        let lazyNext = Lazy(next)
         return flatMap { firstResult in
-            p.map { secondResult in
+            lazyNext.value.map { secondResult in
                 (firstResult, secondResult)
             }
         }
     }
 
-    func seqIgnoreLeft<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
-        // TODO: make lazy
-        let p = next()
-        return flatMap { _ in p }
+    func seqIgnoreLeft<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
+        let lazyNext = Lazy(next)
+        return flatMap { _ in lazyNext.value }
     }
 
-    func seqIgnoreRight<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<T, Input> {
-        // TODO: make lazy
-        let p = next()
+    func seqIgnoreRight<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<T, Input> {
+        let lazyNext = Lazy(next)
         return flatMap { firstResult in
-            p.map { _ in
+            lazyNext.value.map { _ in
                 firstResult
             }
         }
     }
 
     // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
-    func append<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
-        // TODO: make lazy
-        let p = next()
+    func append<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
+        let lazyNext = Lazy(next)
         return Parser<U, Input> { input in
-            self.parse(input).append(p.parse(input))
+            self.parse(input).append(lazyNext.value.parse(input))
         }
     }
     
     // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
-    func or<U>(_ next: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+    func or<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
         return append(next())
     }
 }
@@ -102,7 +98,7 @@ func char<Input>(_ char: Character) -> Parser<Character, Input>
 
 // NOTE: unfortunately it is not possible in Swift constrain U to be a supertype of T
 func | <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                     rhs: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+                     rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
 
     return lhs().or(rhs())
 }
@@ -112,7 +108,7 @@ infix operator ~ {
 }
 
 func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                     rhs: @autoclosure () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+                     rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
     return lhs().seq(rhs())
 }
 
@@ -122,7 +118,7 @@ infix operator ~> {
 }
 
 func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                      rhs: @autoclosure () -> Parser<U, Input>) -> Parser<U, Input> {
+                      rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
     return lhs().seqIgnoreLeft(rhs())
 }
 
@@ -132,7 +128,7 @@ infix operator <~ {
 }
 
 func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                      rhs: @autoclosure () -> Parser<U, Input>) -> Parser<T, Input> {
+                      rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<T, Input> {
     return lhs().seqIgnoreRight(rhs())
 }
 
