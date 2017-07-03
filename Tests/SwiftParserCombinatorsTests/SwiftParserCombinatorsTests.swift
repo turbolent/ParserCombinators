@@ -9,95 +9,110 @@ extension String {
 
 class SwiftParserCombinatorsTests: XCTestCase {
 
-    func testMap() {
-        let parser: Parser<String, StringReader> =
-            char(Character("a")).map { String($0).uppercased() }
-
-        let reader = StringReader(string: "a")
-
+    func expectSuccess(parser: Parser<String, StringReader>, input: String, expected: String) {
+        let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
         case .success(let value, _):
-            XCTAssertEqual(value, "A")
+            XCTAssertEqual(value, expected)
         case .failure:
             XCTFail("\(result) is not successful")
         }
+    }
+
+    func expectFailure(parser: Parser<String, StringReader>, input: String) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success:
+            XCTFail("\(result) is successful")
+        case .failure:
+            break
+        }
+    }
+
+    func testMap() {
+        let extractedExpr: Parser<String, StringReader> = 
+            char(Character("a"))
+                .map { String($0).uppercased() }
+        expectSuccess(parser: extractedExpr,
+                      input: "a",
+                      expected: "A")
     }
 
     func testSeq() {
-        let parser: Parser<(Character, Character), StringReader> =
-            char(Character("a")) ~ char(Character("b"))
+        let parser: Parser<String, StringReader> =
+            (char(Character("a")) ~ char(Character("b")))
+                .map(String.init)
 
-        let reader = StringReader(string: "ab")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertTrue(value == (Character("a"), Character("b")))
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
-
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "ab")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "ba")
     }
 
     func testSeqIgnoreLeft() {
-        let parser: Parser<Character, StringReader> =
-            char(Character("a")) ~> char(Character("b"))
+        let parser: Parser<String, StringReader> =
+            (char(Character("a")) ~> char(Character("b")))
+                .map(String.init)
 
-        let reader = StringReader(string: "ab")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertEqual(value, Character("b"))
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "b")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "b")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "b")
     }
 
     func testSeqIgnoreRight() {
-        let parser: Parser<Character, StringReader> =
-            char(Character("a")) <~ char(Character("b"))
+        let parser: Parser<String, StringReader> =
+            (char(Character("a")) <~ char(Character("b")))
+                .map(String.init)
 
-        let reader = StringReader(string: "ab")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertEqual(value, Character("a"))
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "a")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "b")
     }
 
-    func testOrFirst() {
-        let parser: Parser<Character, StringReader> =
-            char(Character("a")) | char(Character("b"))
+    func testOr() {
+        let parser: Parser<String, StringReader> =
+            (char(Character("a")) | char(Character("b")))
+                .map(String.init)
 
-        let reader = StringReader(string: "a")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertEqual(value, Character("a"))
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
-    }
-
-    func testOrAlternative() {
-        let parser: Parser<Character, StringReader> =
-            char(Character("a")) | char(Character("b"))
-
-        let reader = StringReader(string: "b")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertEqual(value, Character("b"))
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: "b")
+        expectSuccess(parser: parser,
+                      input: "ba",
+                      expected: "b")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "a")
     }
 
     func testOrFirstSuccess() {
@@ -106,15 +121,15 @@ class SwiftParserCombinatorsTests: XCTestCase {
             | (char(Character("a")) ~ char(Character("b")))
                 .map(String.init)
 
-        let reader = StringReader(string: "ab")
-
-        let result = parser.parse(reader)
-        switch result {
-        case .success(let value, _):
-            XCTAssertEqual(value, "a")
-        case .failure:
-            XCTFail("\(result) is not successful")
-        }
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "a")
     }
 
     static var allTests = [
@@ -122,8 +137,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testSeq", testSeq),
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
-        ("testOrFirst", testOrFirst),
-        ("testOrAlternative", testOrAlternative),
+        ("testOr", testOr),
         ("testOrFirstSuccess", testOrFirstSuccess)
     ]
 }
