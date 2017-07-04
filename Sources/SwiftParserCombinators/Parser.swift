@@ -126,7 +126,6 @@ func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().seq(rhs())
 }
 
-
 infix operator ~> {
     associativity left
 }
@@ -135,7 +134,6 @@ func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                       rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
     return lhs().seqIgnoreLeft(rhs())
 }
-
 
 infix operator <~ {
     associativity left
@@ -146,6 +144,41 @@ func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().seqIgnoreRight(rhs())
 }
 
-func opt<T, Input>(_ p: @autoclosure () -> Parser<T, Input>) -> Parser<T?, Input> {
-    return p().map { $0 } | success(nil)
+func opt<T, Input>(_ parser: @autoclosure () -> Parser<T, Input>) -> Parser<T?, Input> {
+    return parser().map { $0 } | success(nil)
+}
+
+func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>, min: Int = 0, max: Int? = nil)
+    -> Parser<[T], Input>
+{
+    if let max = max, max == 0 {
+        return success([])
+    }
+
+    return Parser { input in
+        let lazyParser = Lazy(parser)
+
+        var remaining = input
+        var elements: [T] = []
+        var n = 0
+        while true {
+            if n == max {
+                return .success(value: elements, remaining: remaining)
+            }
+
+            let result = lazyParser.value.parse(remaining)
+            switch result {
+            case .success(let value, let rest):
+                elements.append(value)
+                n += 1
+                remaining = rest
+            case .failure(let message, let remaining2):
+                guard n >= min else {
+                    // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `result` here.
+                    return .failure(message: message, remaining: remaining2)
+                }
+                return .success(value: elements, remaining: remaining)
+            }
+        }
+    }
 }

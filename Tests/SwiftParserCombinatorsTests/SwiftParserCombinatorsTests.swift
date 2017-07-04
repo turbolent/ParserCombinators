@@ -31,6 +31,17 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
+    func expectSuccess(parser: Parser<[String], StringReader>, input: String, expected: [String]) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success(let value, _):
+            XCTAssertEqual(value, expected)
+        case .failure:
+            XCTFail("\(result) is not successful")
+        }
+    }
+
     func expectFailure(parser: Parser<String, StringReader>, input: String) {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
@@ -43,6 +54,17 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func expectFailure(parser: Parser<String?, StringReader>, input: String) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success:
+            XCTFail("\(result) is successful")
+        case .failure:
+            break
+        }
+    }
+
+    func expectFailure(parser: Parser<[String], StringReader>, input: String) {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -176,6 +198,78 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: nil)
     }
 
+    func testRepNoMinNoMax() {
+        let parser: Parser<[String], StringReader> =
+            rep(char(Character("a")).map(String.init))
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: ["a"])
+        // NOTE: successful, as "b" is remaining input
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: [])
+    }
+
+    func testRepMinNoMax() {
+        let parser: Parser<[String], StringReader> =
+            rep(char(Character("a")).map(String.init), min: 2)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectSuccess(parser: parser,
+                      input: "aaa",
+                      expected: ["a", "a", "a"])
+    }
+
+    func testRepMinMax() {
+        let parser: Parser<[String], StringReader> =
+            rep(char(Character("a")).map(String.init),
+                min: 2,
+                max: 4)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaa",
+                      expected: ["a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaaa",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaaaa",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+    }
+
     static var allTests = [
         ("testMap", testMap),
         ("testSeq", testSeq),
@@ -183,6 +277,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testSeqIgnoreRight", testSeqIgnoreRight),
         ("testOr", testOr),
         ("testOrFirstSuccess", testOrFirstSuccess),
-        ("testOpt", testOpt)
+        ("testOpt", testOpt),
+        ("testRepNoMinNoMax", testRepNoMinNoMax),
+        ("testRepMinNoMax", testRepMinNoMax),
+        ("testRepMinMax", testRepMinMax)
     ]
 }
