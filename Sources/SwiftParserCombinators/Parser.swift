@@ -62,6 +62,10 @@ class Parser<T, Input: Reader> {
     func opt() -> Parser<T?, Input> {
         return SwiftParserCombinators.opt(self)
     }
+
+    func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Input> {
+        return SwiftParserCombinators.rep(self, min: min, max: max)
+    }
 }
 
 func success<T, Input>(_ value: T) -> Parser<T, Input> {

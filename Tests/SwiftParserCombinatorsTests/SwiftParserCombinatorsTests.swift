@@ -200,7 +200,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepNoMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            rep(char(Character("a")).map(String.init))
+            char(Character("a"))
+                .map(String.init)
+                .rep()
 
         expectSuccess(parser: parser,
                       input: "",
@@ -222,7 +224,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            rep(char(Character("a")).map(String.init), min: 2)
+            char(Character("a"))
+                .map(String.init)
+                .rep(min: 2)
 
         expectFailure(parser: parser,
                       input: "")
@@ -243,9 +247,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinMax() {
         let parser: Parser<[String], StringReader> =
-            rep(char(Character("a")).map(String.init),
-                min: 2,
-                max: 4)
+            char(Character("a"))
+                .map(String.init)
+                .rep(min: 2, max: 4)
 
         expectFailure(parser: parser,
                       input: "")
