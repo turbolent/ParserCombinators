@@ -273,6 +273,28 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "ab")
     }
 
+    func testTuples() {
+        let parser: Parser<String, StringReader> =
+            (char(Character("(")) ~ char(Character(" ")).rep() ~ char(Character(")"))) ^^ {
+                let (open, inner, outer) = $0
+                return String([open] + inner + [outer])
+            }
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectSuccess(parser: parser,
+                      input: "()",
+                      expected: "()")
+        expectSuccess(parser: parser,
+                      input: "( )",
+                      expected: "( )")
+        expectSuccess(parser: parser,
+                      input: "(  )",
+                      expected: "(  )")
+    }
+
     static var allTests = [
         ("testMap", testMap),
         ("testSeq", testSeq),
@@ -283,6 +305,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testOpt", testOpt),
         ("testRepNoMinNoMax", testRepNoMinNoMax),
         ("testRepMinNoMax", testRepMinNoMax),
-        ("testRepMinMax", testRepMinMax)
+        ("testRepMinMax", testRepMinMax),
+        ("testTuples", testTuples)
     ]
 }

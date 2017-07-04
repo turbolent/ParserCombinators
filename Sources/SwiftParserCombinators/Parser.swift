@@ -147,6 +147,22 @@ func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().seq(rhs())
 }
 
+func ~ <T, U, V, Input>(lhs: @autoclosure () -> Parser<(T, U), Input>,
+                        rhs: @autoclosure @escaping () -> Parser<V, Input>) -> Parser<(T, U, V), Input> {
+    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.1) }
+}
+
+func ~ <T, U, V, W, Input>(lhs: @autoclosure () -> Parser<(T, U, V), Input>,
+                           rhs: @autoclosure @escaping () -> Parser<W, Input>) -> Parser<(T, U, V, W), Input> {
+    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
+}
+
+func ~ <T, U, V, W, X, Input>(lhs: @autoclosure () -> Parser<(T, U, V, W), Input>,
+                              rhs: @autoclosure @escaping () -> Parser<X, Input>) -> Parser<(T, U, V, W, X), Input> {
+    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
+}
+
+
 precedencegroup ApplicativeSequencePrecedence {
     associativity: left
     higherThan: ApplicativePrecedence
