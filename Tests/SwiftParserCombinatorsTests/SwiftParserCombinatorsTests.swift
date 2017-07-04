@@ -77,8 +77,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testMap() {
         let parser: Parser<String, StringReader> =
-            char(Character("a"))
-                ^^ { String($0).uppercased() }
+            char("a") ^^ { String($0).uppercased() }
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -87,8 +86,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testMapValue() {
         let parser: Parser<String, StringReader> =
-            char(Character("a"))
-                ^^^ "XXX"
+            char("a") ^^^ "XXX"
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -97,8 +95,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeq() {
         let parser: Parser<String, StringReader> =
-            (char(Character("a")) ~ char(Character("b")))
-                ^^ String.init
+            (char("a") ~ char("b")) ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -116,8 +113,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeqIgnoreLeft() {
         let parser: Parser<String, StringReader> =
-            (char(Character("a")) ~> char(Character("b")))
-                ^^ String.init
+            (char("a") ~> char("b")) ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -133,8 +129,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeqIgnoreRight() {
         let parser: Parser<String, StringReader> =
-            (char(Character("a")) <~ char(Character("b")))
-                ^^ String.init
+            (char("a") <~ char("b")) ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -150,8 +145,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOr() {
         let parser: Parser<String, StringReader> =
-            (char(Character("a")) | char(Character("b")))
-                ^^ String.init
+            (char("a") | char("b")) ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -172,8 +166,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
-            (char(Character("a")) ^^ String.init)
-            | ((char(Character("a")) ~ char(Character("b"))) ^^ String.init)
+            (char("a") ^^ String.init)
+            | ((char("a") ~ char("b")) ^^ String.init)
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -188,7 +182,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOpt() {
         let parser: Parser<String?, StringReader> =
-            (char(Character("a")) ^^ String.init).opt()
+            (char("a") ^^ String.init).opt()
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -210,9 +204,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepNoMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            char(Character("a"))
-                .map(String.init)
-                .rep()
+            (char("a") ^^ String.init).rep()
 
         expectSuccess(parser: parser,
                       input: "",
@@ -234,9 +226,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            char(Character("a"))
-                .map(String.init)
-                .rep(min: 2)
+            (char("a") ^^ String.init).rep(min: 2)
 
         expectFailure(parser: parser,
                       input: "")
@@ -257,9 +247,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinMax() {
         let parser: Parser<[String], StringReader> =
-            char(Character("a"))
-                .map(String.init)
-                .rep(min: 2, max: 4)
+            (char("a") ^^ String.init).rep(min: 2, max: 4)
 
         expectFailure(parser: parser,
                       input: "")
@@ -286,7 +274,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testTuples() {
         let parser: Parser<String, StringReader> =
-            (char(Character("(")) ~ char(Character(" ")).rep() ~ char(Character(")"))) ^^ {
+            (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
                 let (open, inner, outer) = $0
                 return String([open] + inner + [outer])
             }
@@ -309,11 +297,11 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRecursive() {
         let simple: Parser<String, StringReader> =
-            (char(Character("(")) ~ char(Character(")"))) ^^^ "()"
+            (char("(") ~ char(")")) ^^^ "()"
         let parser: Parser<String, StringReader> =
             Parser.recursive { parser in
                 let nested: Parser<String, StringReader> =
-                    (char(Character("(")) ~ parser ~ char(Character(")"))) ^^ {
+                    (char("(") ~ parser ~ char(")")) ^^ {
                         let (_, inner, _) = $0
                         return "(\(inner))"
                     }
