@@ -121,27 +121,45 @@ func | <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().or(rhs())
 }
 
-infix operator ~ {
-    associativity left
+
+
+precedencegroup AlternativePrecedence {
+    associativity: left
+    higherThan: LogicalConjunctionPrecedence
+    lowerThan: ComparisonPrecedence
 }
+
+precedencegroup ApplicativePrecedence {
+    associativity: left
+    higherThan: AlternativePrecedence
+    lowerThan: NilCoalescingPrecedence
+}
+
+infix operator ^^ : ApplicativePrecedence
+
+infix operator ~: ApplicativePrecedence
 
 func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                      rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
     return lhs().seq(rhs())
 }
 
-infix operator ~> {
-    associativity left
+precedencegroup ApplicativeSequencePrecedence {
+    associativity: left
+    higherThan: ApplicativePrecedence
+    lowerThan: NilCoalescingPrecedence
 }
+
+// NOTE: actual defintition would be, but already defined in the standard definition as a workaround,
+// see https://github.com/apple/swift/blob/48308411393e730cf3cb21d353a9be31045c47e4/stdlib/public/core/Policy.swift#L705
+//infix operator ~> : ApplicativeSequencePrecedence
 
 func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                       rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
     return lhs().seqIgnoreLeft(rhs())
 }
 
-infix operator <~ {
-    associativity left
-}
+infix operator <~ : ApplicativeSequencePrecedence
 
 func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                       rhs: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<T, Input> {
