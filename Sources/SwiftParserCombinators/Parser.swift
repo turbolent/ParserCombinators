@@ -60,6 +60,17 @@ class Parser<T, Input: Reader> {
     }
 }
 
+func success<T, Input>(_ value: T) -> Parser<T, Input> {
+    return Parser { input in
+        .success(value: value, remaining: input)
+    }
+}
+
+func failure<T, Input>(_ message: String) -> Parser<T, Input> {
+    return Parser { input in
+        .failure(message: message, remaining: input)
+    }
+}
 
 func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
                      errorMessageSupplier: @escaping (Input.Element) -> String)
@@ -88,7 +99,6 @@ func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input>
     return acceptIf(predicate: { $0 == element },
                     errorMessageSupplier: { e in "expected \(element) but found \(e)" })
 }
-
 
 func char<Input>(_ char: Character) -> Parser<Character, Input>
     where Input.Element == Character
@@ -132,3 +142,6 @@ func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().seqIgnoreRight(rhs())
 }
 
+func opt<T, Input>(_ p: @autoclosure () -> Parser<T, Input>) -> Parser<T?, Input> {
+    return p().map { $0 } | success(nil)
+}

@@ -20,7 +20,29 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
+    func expectSuccess(parser: Parser<String?, StringReader>, input: String, expected: String?) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success(let value, _):
+            XCTAssertEqual(value, expected)
+        case .failure:
+            XCTFail("\(result) is not successful")
+        }
+    }
+
     func expectFailure(parser: Parser<String, StringReader>, input: String) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success:
+            XCTFail("\(result) is successful")
+        case .failure:
+            break
+        }
+    }
+
+    func expectFailure(parser: Parser<String?, StringReader>, input: String) {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -132,12 +154,35 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: "a")
     }
 
+    func testOpt() {
+        let parser: Parser<String?, StringReader> =
+            opt(char(Character("a")).map(String.init))
+
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "a")
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: nil)
+
+        // NOTE: successful, as "b" is remaining input
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: nil)
+    }
+
     static var allTests = [
         ("testMap", testMap),
         ("testSeq", testSeq),
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
         ("testOr", testOr),
-        ("testOrFirstSuccess", testOrFirstSuccess)
+        ("testOrFirstSuccess", testOrFirstSuccess),
+        ("testOpt", testOpt)
     ]
 }
