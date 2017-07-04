@@ -76,18 +76,29 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testMap() {
-        let extractedExpr: Parser<String, StringReader> = 
+        let parser: Parser<String, StringReader> =
             char(Character("a"))
-                .map { String($0).uppercased() }
-        expectSuccess(parser: extractedExpr,
+                ^^ { String($0).uppercased() }
+
+        expectSuccess(parser: parser,
                       input: "a",
                       expected: "A")
+    }
+
+    func testMapValue() {
+        let parser: Parser<String, StringReader> =
+            char(Character("a"))
+                ^^^ "XXX"
+
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "XXX")
     }
 
     func testSeq() {
         let parser: Parser<String, StringReader> =
             (char(Character("a")) ~ char(Character("b")))
-                .map(String.init)
+                ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -106,7 +117,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testSeqIgnoreLeft() {
         let parser: Parser<String, StringReader> =
             (char(Character("a")) ~> char(Character("b")))
-                .map(String.init)
+                ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -123,7 +134,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testSeqIgnoreRight() {
         let parser: Parser<String, StringReader> =
             (char(Character("a")) <~ char(Character("b")))
-                .map(String.init)
+                ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -140,7 +151,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testOr() {
         let parser: Parser<String, StringReader> =
             (char(Character("a")) | char(Character("b")))
-                .map(String.init)
+                ^^ String.init
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -297,6 +308,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     static var allTests = [
         ("testMap", testMap),
+        ("testMapValue", testMapValue),
         ("testSeq", testSeq),
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
