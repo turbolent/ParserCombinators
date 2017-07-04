@@ -16,7 +16,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
         case .failure:
-            XCTFail("\(result) is not successful")
+            XCTFail(String(describing: result))
         }
     }
 
@@ -27,7 +27,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
         case .failure:
-            XCTFail("\(result) is not successful")
+            XCTFail(String(describing: result))
         }
     }
 
@@ -38,7 +38,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
         case .failure:
-            XCTFail("\(result) is not successful")
+            XCTFail(String(describing: result))
         }
     }
 

@@ -35,13 +35,25 @@ enum ParseResult<T, Input: Reader> {
             case .success:
                 return alt
             case .failure(_, let altRemaining):
-                if altRemaining.pos < remaining.pos {
+                if altRemaining.offset < remaining.offset {
                     // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
                     return .failure(message: message, remaining: remaining)
                 } else {
                     return alt
                 }
             }
+        }
+    }
+}
+
+extension ParseResult: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .success(let value, let remaining):
+            return "[\(remaining.position)] parsed: \(value)"
+
+        case .failure(let message, let remaining):
+            return "[\(remaining.position)] failure: \(message)\n\n\(remaining.position.longDescription)"
         }
     }
 }
