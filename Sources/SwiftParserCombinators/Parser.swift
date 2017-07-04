@@ -58,6 +58,10 @@ class Parser<T, Input: Reader> {
     func or<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
         return append(next())
     }
+
+    func opt() -> Parser<T?, Input> {
+        return SwiftParserCombinators.opt(self)
+    }
 }
 
 func success<T, Input>(_ value: T) -> Parser<T, Input> {

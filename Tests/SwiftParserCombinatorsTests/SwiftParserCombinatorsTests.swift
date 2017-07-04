@@ -156,7 +156,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOpt() {
         let parser: Parser<String?, StringReader> =
-            opt(char(Character("a")).map(String.init))
+            char(Character("a")).map(String.init).opt()
 
         expectSuccess(parser: parser,
                       input: "a",
