@@ -121,8 +121,6 @@ func | <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
     return lhs().or(rhs())
 }
 
-
-
 precedencegroup AlternativePrecedence {
     associativity: left
     higherThan: LogicalConjunctionPrecedence
@@ -136,6 +134,11 @@ precedencegroup ApplicativePrecedence {
 }
 
 infix operator ^^ : ApplicativePrecedence
+
+func ^^ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                      rhs: @escaping (T) -> U) -> Parser<U, Input> {
+    return lhs().map(rhs)
+}
 
 infix operator ~: ApplicativePrecedence
 

@@ -161,9 +161,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
-            char(Character("a")).map(String.init)
-            | (char(Character("a")) ~ char(Character("b")))
-                .map(String.init)
+            (char(Character("a")) ^^ String.init)
+            | ((char(Character("a")) ~ char(Character("b"))) ^^ String.init)
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -178,7 +177,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOpt() {
         let parser: Parser<String?, StringReader> =
-            char(Character("a")).map(String.init).opt()
+            (char(Character("a")) ^^ String.init).opt()
 
         expectSuccess(parser: parser,
                       input: "a",
