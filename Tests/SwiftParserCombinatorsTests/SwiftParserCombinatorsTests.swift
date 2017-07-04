@@ -306,6 +306,37 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: "(  )")
     }
 
+
+    func testRecursive() {
+        let simple: Parser<String, StringReader> =
+            (char(Character("(")) ~ char(Character(")"))) ^^^ "()"
+        let parser: Parser<String, StringReader> =
+            Parser.recursive { parser in
+                let nested: Parser<String, StringReader> =
+                    (char(Character("(")) ~ parser ~ char(Character(")"))) ^^ {
+                        let (_, inner, _) = $0
+                        return "(\(inner))"
+                    }
+                return simple | nested
+            }
+
+        expectSuccess(parser: parser,
+                      input: "()",
+                      expected: "()")
+        expectSuccess(parser: parser,
+                      input: "(())",
+                      expected: "(())")
+        expectSuccess(parser: parser,
+                      input: "((()))",
+                      expected: "((()))")
+        expectFailure(parser: parser,
+                      input: "(((")
+        expectFailure(parser: parser,
+                      input: "((()")
+        expectFailure(parser: parser,
+                      input: "((())")
+    }
+
     static var allTests = [
         ("testMap", testMap),
         ("testMapValue", testMapValue),
@@ -318,6 +349,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepNoMinNoMax", testRepNoMinNoMax),
         ("testRepMinNoMax", testRepMinNoMax),
         ("testRepMinMax", testRepMinMax),
-        ("testTuples", testTuples)
+        ("testTuples", testTuples),
+        ("testRecursive", testRecursive)
     ]
 }
