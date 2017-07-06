@@ -263,3 +263,16 @@ func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>, min:
         }
     }
 }
+
+func commit<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>) -> Parser<T, Input> {
+    let lazyParser = Lazy(parser)
+    return Parser { input in
+        let result = lazyParser.value.parse(input)
+        switch result {
+        case .success, .error:
+            return result
+        case let .failure(message, remaining):
+            return .error(message: message, remaining: remaining)
+        }
+    }
+}
