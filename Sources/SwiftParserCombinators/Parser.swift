@@ -7,8 +7,8 @@ class Parser<T, Input: Reader> {
 
     let parse: (Input) -> Result
 
-    init(f: @escaping (Input) -> Result) {
-        self.parse = f
+    init(parse: @escaping (Input) -> Result) {
+        self.parse = parse
     }
 
     func map<U>(_ f: @escaping (T) -> U) -> Parser<U, Input> {
@@ -32,6 +32,15 @@ class Parser<T, Input: Reader> {
 
     func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
         let lazyNext = Lazy(next)
+        return flatMap { firstResult in
+            lazyNext.value.map { secondResult in
+                (firstResult, secondResult)
+            }
+        }
+    }
+
+    func seqCommit<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+        let lazyNext = Lazy({ commit(next()) })
         return flatMap { firstResult in
             lazyNext.value.map { secondResult in
                 (firstResult, secondResult)
@@ -276,3 +285,4 @@ func commit<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>) -
         }
     }
 }
+
