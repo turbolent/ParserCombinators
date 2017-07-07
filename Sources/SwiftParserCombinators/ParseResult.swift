@@ -81,3 +81,21 @@ extension ParseResult: CustomStringConvertible {
     }
 }
 
+
+func success<T, Input>(_ value: T) -> Parser<T, Input> {
+    return Parser { input in
+        .success(value: value, remaining: input)
+    }
+}
+
+func failure<T, Input>(_ message: String) -> Parser<T, Input> {
+    return Parser { input in
+        .failure(message: message, remaining: input)
+    }
+}
+
+func error<T, Input>(_ message: String) -> Parser<T, Input> {
+    return Parser { input in
+        .error(message: message, remaining: input)
+    }
+}
