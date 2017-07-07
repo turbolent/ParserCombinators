@@ -15,7 +15,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         switch result {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
-        case .failure:
+        case .failure, .error:
             XCTFail(String(describing: result))
         }
     }
@@ -26,7 +26,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         switch result {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
-        case .failure:
+        case .failure, .error:
             XCTFail(String(describing: result))
         }
     }
@@ -37,7 +37,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         switch result {
         case .success(let value, _):
             XCTAssertEqual(value, expected)
-        case .failure:
+        case .failure, .error:
             XCTFail(String(describing: result))
         }
     }
@@ -50,6 +50,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
             XCTFail("\(result) is successful")
         case .failure:
             break
+        case .error:
+            XCTFail("\(result) is error")
         }
     }
 
@@ -61,6 +63,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
             XCTFail("\(result) is successful")
         case .failure:
             break
+        case .error:
+            XCTFail("\(result) is error")
         }
     }
 
@@ -72,6 +76,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
             XCTFail("\(result) is successful")
         case .failure:
             break
+        case .error:
+            XCTFail("\(result) is error")
         }
     }
 

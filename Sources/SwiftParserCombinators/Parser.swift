@@ -7,8 +7,8 @@ class Parser<T, Input: Reader> {
 
     let parse: (Input) -> Result
 
-    init(f: @escaping (Input) -> Result) {
-        self.parse = f
+    init(parse: @escaping (Input) -> Result) {
+        self.parse = parse
     }
 
     func map<U>(_ f: @escaping (T) -> U) -> Parser<U, Input> {
@@ -32,6 +32,15 @@ class Parser<T, Input: Reader> {
 
     func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
         let lazyNext = Lazy(next)
+        return flatMap { firstResult in
+            lazyNext.value.map { secondResult in
+                (firstResult, secondResult)
+            }
+        }
+    }
+
+    func seqCommit<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
+        let lazyNext = Lazy({ commit(next()) })
         return flatMap { firstResult in
             lazyNext.value.map { secondResult in
                 (firstResult, secondResult)
@@ -243,17 +252,37 @@ func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>, min:
 
             let result = lazyParser.value.parse(remaining)
             switch result {
-            case .success(let value, let rest):
+            case let .success(value, rest):
                 elements.append(value)
                 n += 1
                 remaining = rest
-            case .failure(let message, let remaining2):
+            case let .failure(message2, remaining2):
                 guard n >= min else {
                     // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `result` here.
-                    return .failure(message: message, remaining: remaining2)
+                    return .failure(message: message2, remaining: remaining2)
+                }
+                return .success(value: elements, remaining: remaining)
+            case let .error(message2, remaining2):
+                guard n >= min else {
+                    // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `result` here.
+                    return .error(message: message2, remaining: remaining2)
                 }
                 return .success(value: elements, remaining: remaining)
             }
         }
     }
 }
+
+func commit<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>) -> Parser<T, Input> {
+    let lazyParser = Lazy(parser)
+    return Parser { input in
+        let result = lazyParser.value.parse(input)
+        switch result {
+        case .success, .error:
+            return result
+        case let .failure(message, remaining):
+            return .error(message: message, remaining: remaining)
+        }
+    }
+}
+

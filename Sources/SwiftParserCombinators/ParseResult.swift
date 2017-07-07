@@ -2,35 +2,50 @@
 enum ParseResult<T, Input: Reader> {
     case success(value: T, remaining: Input)
     case failure(message: String, remaining: Input)
+    case error(message: String, remaining: Input)
 
     func map<U>(_ f: (T) -> U) -> ParseResult<U, Input> {
         switch self {
-        case .success(let value, let remaining):
+        case let .success(value, remaining):
             return .success(value: f(value), remaining: remaining)
-        case .failure(let message, let remaining):
+        case let .failure(message, remaining):
             // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
             return .failure(message: message, remaining: remaining)
+        case let .error(message, remaining):
+            // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
+            return .error(message: message, remaining: remaining)
         }
     }
 
     func flatMapWithNext<U>(_ f: (T) -> Parser<U, Input>) -> ParseResult<U, Input> {
         switch self {
-        case .success(let value, let remaining):
+        case let .success(value, remaining):
             return f(value).parse(remaining)
-        case .failure(let message, let remaining):
+
+        case let .failure(message, remaining):
             // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
             return .failure(message: message, remaining: remaining)
+
+        case let .error(message, remaining):
+            // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
+            return .error(message: message, remaining: remaining)
         }
     }
 
     func append<U>(_ alternative: @autoclosure () -> ParseResult<U, Input>) -> ParseResult<U, Input> {
         switch self {
-        case .success(let value, let remaining):
+        case let .success(value, remaining):
             // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here.
             // Furthermore it is not possible in Swift constrain U to be a supertype of T
             return .success(value: value as! U, remaining: remaining)
-        case .failure(let message, let remaining):
+
+        case let .error(message, remaining):
+            // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here.
+            return .error(message: message, remaining: remaining)
+
+        case let .failure(message, remaining):
             let alt = alternative()
+
             switch alt {
             case .success:
                 return alt
@@ -38,9 +53,14 @@ enum ParseResult<T, Input: Reader> {
                 if altRemaining.offset < remaining.offset {
                     // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
                     return .failure(message: message, remaining: remaining)
-                } else {
-                    return alt
                 }
+                return alt
+            case .error(_, let altRemaining):
+                if altRemaining.offset < remaining.offset {
+                    // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
+                    return .error(message: message, remaining: remaining)
+                }
+                return alt
             }
         }
     }
@@ -49,11 +69,14 @@ enum ParseResult<T, Input: Reader> {
 extension ParseResult: CustomStringConvertible {
     var description: String {
         switch self {
-        case .success(let value, let remaining):
+        case let .success(value, remaining):
             return "[\(remaining.position)] parsed: \(value)"
 
-        case .failure(let message, let remaining):
+        case let .failure(message, remaining):
             return "[\(remaining.position)] failure: \(message)\n\n\(remaining.position.longDescription)"
+
+        case let .error(message, remaining):
+            return "[\(remaining.position)] error: \(message)\n\n\(remaining.position.longDescription)"
         }
     }
 }
