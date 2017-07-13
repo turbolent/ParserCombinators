@@ -1,5 +1,4 @@
 
-
 class Lazy<T> {
     let generate: () -> T
     lazy var value: T = {
@@ -10,4 +9,3 @@ class Lazy<T> {
         self.generate = generate
     }
 }
-
