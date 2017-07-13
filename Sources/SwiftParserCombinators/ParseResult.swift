@@ -1,4 +1,13 @@
 
+/**
+ A parse result can be either successful (`success`) or not.
+ Non-successful results can be either failures (`failure`) or errors (`error`).
+ Failures are non-fatal, errors are fatal.
+ Successful results provide a result `value` of type `T`.
+ Non-successful results provide a message explaining why the parse did not succeed.
+ All results provide the remaining input to be parsed.
+*/
+
 enum ParseResult<T, Input: Reader> {
     case success(value: T, remaining: Input)
     case failure(message: String, remaining: Input)
