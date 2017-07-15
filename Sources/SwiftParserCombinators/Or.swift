@@ -3,7 +3,7 @@ extension Parser {
 
     // NOTE: unfortunately it is not possible in Swift to constrain U to be a supertype of T
     func append<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<U, Input> {
-        let lazyNext = Lazy(next)
+        var lazyNext = Lazy(next)
         return Parser<U, Input> { input in
             self.parse(input).append(lazyNext.value.parse(input))
         }

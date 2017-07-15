@@ -15,7 +15,7 @@ func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>, min:
     }
 
     return Parser { input in
-        let lazyParser = Lazy(parser)
+        var lazyParser = Lazy(parser)
 
         var remaining = input
         var elements: [T] = []
