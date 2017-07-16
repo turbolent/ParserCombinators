@@ -88,6 +88,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser,
                       input: "a",
                       expected: "A")
+
     }
 
     func testMapValue() {
@@ -299,7 +300,6 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "(  )",
                       expected: "(  )")
     }
-
 
     func testRecursive() {
         let simple: Parser<String, StringReader> =

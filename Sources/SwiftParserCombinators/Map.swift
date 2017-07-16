@@ -7,7 +7,7 @@ extension Parser {
     }
 
     func map<U>(_ value: @autoclosure @escaping () -> U) -> Parser<U, Input> {
-        let lazyValue = Lazy(value)
+        var lazyValue = Lazy(value)
         return Parser<U, Input> { input in
             self.parse(input).map { _ in lazyValue.value }
         }
