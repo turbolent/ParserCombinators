@@ -120,7 +120,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeqIgnoreLeft() {
         let parser: Parser<String, StringReader> =
-            (char("a") ~> char("b")) ^^ String.init
+            (char("a") ~> char("b")) ^^ { String($0) }
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -136,7 +136,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeqIgnoreRight() {
         let parser: Parser<String, StringReader> =
-            (char("a") <~ char("b")) ^^ String.init
+            (char("a") <~ char("b")) ^^ { String($0) }
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -152,7 +152,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOr() {
         let parser: Parser<String, StringReader> =
-            (char("a") | char("b")) ^^ String.init
+            (char("a") | char("b")) ^^ { String($0) }
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -173,7 +173,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
-            (char("a") ^^ String.init)
+            (char("a") ^^ { String($0) })
             | ((char("a") ~ char("b")) ^^ String.init)
 
         expectSuccess(parser: parser,
@@ -189,7 +189,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOpt() {
         let parser: Parser<String?, StringReader> =
-            (char("a") ^^ String.init).opt()
+            (char("a") ^^ { String($0) }).opt()
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -211,7 +211,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepNoMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            (char("a") ^^ String.init).rep()
+            (char("a") ^^ { String($0) }).rep()
 
         expectSuccess(parser: parser,
                       input: "",
@@ -233,7 +233,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinNoMax() {
         let parser: Parser<[String], StringReader> =
-            (char("a") ^^ String.init).rep(min: 2)
+            (char("a") ^^ { String($0) }).rep(min: 2)
 
         expectFailure(parser: parser,
                       input: "")
@@ -254,7 +254,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testRepMinMax() {
         let parser: Parser<[String], StringReader> =
-            (char("a") ^^ String.init).rep(min: 2, max: 4)
+            (char("a") ^^ { String($0) }).rep(min: 2, max: 4)
 
         expectFailure(parser: parser,
                       input: "")
