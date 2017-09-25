@@ -1,22 +1,27 @@
 
+import Trampoline
+
+
 func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
                       errorMessageSupplier: @escaping (Input.Element) -> String)
     -> Parser<Input.Element, Input>
 {
     return Parser { input in
         guard !input.atEnd else {
-            return .failure(message: "end of input", remaining: input)
+            return Done(.failure(message: "end of input",
+                                 remaining: input))
         }
 
         let element = input.first
 
         guard predicate(element) else {
             let message = errorMessageSupplier(element)
-            return .failure(message: message, remaining: input)
+            return Done(.failure(message: message,
+                                 remaining: input))
         }
 
-        return .success(value: element,
-                        remaining: input.rest)
+        return Done(.success(value: element,
+                             remaining: input.rest))
     }
 }
 

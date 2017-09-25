@@ -1,13 +1,17 @@
 
-// NOTE: could be just `typealias Parser<T, Input: Reader> = (Input) -> ParseResult<T, Input>`
-// but wouldn't allow providing chaining methods
+import Trampoline
+
 
 struct Parser<T, Input: Reader> {
     typealias Result = ParseResult<T, Input>
 
-    let parse: (Input) -> Result
+    let step: (Input) -> Trampoline<Result>
 
-    init(parse: @escaping (Input) -> Result) {
-        self.parse = parse
+    init(step: @escaping (Input) -> Trampoline<Result>) {
+        self.step = step
+    }
+
+    func parse(_ input: Input) -> Result {
+        return step(input).run()
     }
 }

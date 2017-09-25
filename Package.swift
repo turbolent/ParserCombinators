@@ -7,5 +7,9 @@ let package = Package(
     name: "SwiftParserCombinators",
     targets: [
         Target(name: "SwiftParserCombinators")
+    ],
+    dependencies: [
+        .Package(url: "https://github.com/turbolent/Trampoline.git",
+                 majorVersion: 0)
     ]
 )
