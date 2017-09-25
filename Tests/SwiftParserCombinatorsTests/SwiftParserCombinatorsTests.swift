@@ -289,35 +289,40 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: "(  )")
     }
 
-//    func testRecursive() {
-//        let simple: Parser<String, StringReader> =
-//            (char("(") ~ char(")")) ^^^ "()"
-//        let parser: Parser<String, StringReader> =
-//            Parser.recursive { parser in
-//                let nested: Parser<String, StringReader> =
-//                    (char("(") ~ parser ~ char(")")) ^^ {
-//                        let (_, inner, _) = $0
-//                        return "(\(inner))"
-//                    }
-//                return simple | nested
-//            }
-//
-//        expectSuccess(parser: parser,
-//                      input: "()",
-//                      expected: "()")
-//        expectSuccess(parser: parser,
-//                      input: "(())",
-//                      expected: "(())")
-//        expectSuccess(parser: parser,
-//                      input: "((()))",
-//                      expected: "((()))")
-//        expectFailure(parser: parser,
-//                      input: "(((")
-//        expectFailure(parser: parser,
-//                      input: "((()")
-//        expectFailure(parser: parser,
-//                      input: "((())")
-//    }
+    func testRecursive() {
+        let simple: Parser<String, StringReader> =
+            (char("(") ~ char(")")) ^^^ "()"
+        let parser: Parser<String, StringReader> =
+            Parser.recursive { parser in
+                let nested: Parser<String, StringReader> =
+                    (char("(") ~ parser ~ char(")")) ^^ {
+                        let (_, inner, _) = $0
+                        return "(\(inner))"
+                    }
+                return simple | nested
+            }
+
+        expectSuccess(parser: parser,
+                      input: "()",
+                      expected: "()")
+        expectSuccess(parser: parser,
+                      input: "(())",
+                      expected: "(())")
+        expectSuccess(parser: parser,
+                      input: "((()))",
+                      expected: "((()))")
+        expectFailure(parser: parser,
+                      input: "(((")
+        expectFailure(parser: parser,
+                      input: "((()")
+        expectFailure(parser: parser,
+                      input: "((())")
+
+        let long = String(repeating: "(", count: 10000)
+             + String(repeating: ")", count: 10000)
+
+        expectSuccess(parser: parser, input: long, expected: long)
+    }
 
     static var allTests = [
         ("testMap", testMap),
@@ -332,6 +337,6 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepMinNoMax", testRepMinNoMax),
         ("testRepMinMax", testRepMinMax),
         ("testTuples", testTuples),
-//        ("testRecursive", testRecursive)
+        ("testRecursive", testRecursive)
     ]
 }
