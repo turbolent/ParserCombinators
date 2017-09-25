@@ -4,7 +4,7 @@ extension Parser {
     // Create a parser which sequentially composes another parser.
     // In case of failure,  back-tracking
     func seqCommit<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<(T, U), Input> {
-        var lazyNext = Lazy({ commit(next()) })
+        let lazyNext = Lazy({ commit(next()) })
         return flatMap { firstResult in
             lazyNext.value.map { secondResult in
                 (firstResult, secondResult)
@@ -15,7 +15,7 @@ extension Parser {
 
 
 func commit<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>) -> Parser<T, Input> {
-    var lazyParser = Lazy(parser)
+    let lazyParser = Lazy(parser)
     return Parser { input in
         lazyParser.value.step(input).map { result in
             switch result {

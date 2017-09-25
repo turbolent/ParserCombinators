@@ -31,6 +31,17 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
+    func expectSuccess<T>(parser: Parser<[T], StringReader>, input: String, expected: [T]) where T: Equatable {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success(let value, _):
+            XCTAssertEqual(value, expected)
+        case .failure, .error:
+            XCTFail(String(describing: result))
+        }
+    }
+
     func expectFailure<T>(parser: Parser<T, StringReader>, input: String) {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
@@ -186,98 +197,98 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: nil)
     }
 
-//    func testRepNoMinNoMax() {
-//        let parser: Parser<[String], StringReader> =
-//            (char("a") ^^ { String($0) }).rep()
-//
-//        expectSuccess(parser: parser,
-//                      input: "",
-//                      expected: [])
-//        expectSuccess(parser: parser,
-//                      input: "a",
-//                      expected: ["a"])
-//        expectSuccess(parser: parser,
-//                      input: "aa",
-//                      expected: ["a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "ab",
-//                      expected: ["a"])
-//        // NOTE: successful, as "b" is remaining input
-//        expectSuccess(parser: parser,
-//                      input: "b",
-//                      expected: [])
-//    }
-//
-//    func testRepMinNoMax() {
-//        let parser: Parser<[String], StringReader> =
-//            (char("a") ^^ { String($0) }).rep(min: 2)
-//
-//        expectFailure(parser: parser,
-//                      input: "")
-//        expectFailure(parser: parser,
-//                      input: "a")
-//        expectSuccess(parser: parser,
-//                      input: "aa",
-//                      expected: ["a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "aab",
-//                      expected: ["a", "a"])
-//        expectFailure(parser: parser,
-//                      input: "ab")
-//        expectSuccess(parser: parser,
-//                      input: "aaa",
-//                      expected: ["a", "a", "a"])
-//    }
-//
-//    func testRepMinMax() {
-//        let parser: Parser<[String], StringReader> =
-//            (char("a") ^^ { String($0) }).rep(min: 2, max: 4)
-//
-//        expectFailure(parser: parser,
-//                      input: "")
-//        expectFailure(parser: parser,
-//                      input: "a")
-//        expectSuccess(parser: parser,
-//                      input: "aa",
-//                      expected: ["a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "aaa",
-//                      expected: ["a", "a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "aaaa",
-//                      expected: ["a", "a", "a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "aaaaa",
-//                      expected: ["a", "a", "a", "a"])
-//        expectSuccess(parser: parser,
-//                      input: "aab",
-//                      expected: ["a", "a"])
-//        expectFailure(parser: parser,
-//                      input: "ab")
-//    }
-//
-//    func testTuples() {
-//        let parser: Parser<String, StringReader> =
-//            (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
-//                let (open, inner, outer) = $0
-//                return String([open] + inner + [outer])
-//            }
-//
-//        expectFailure(parser: parser,
-//                      input: "")
-//        expectFailure(parser: parser,
-//                      input: "ab")
-//        expectSuccess(parser: parser,
-//                      input: "()",
-//                      expected: "()")
-//        expectSuccess(parser: parser,
-//                      input: "( )",
-//                      expected: "( )")
-//        expectSuccess(parser: parser,
-//                      input: "(  )",
-//                      expected: "(  )")
-//    }
-//
+    func testRepNoMinNoMax() {
+        let parser: Parser<[String], StringReader> =
+            (char("a") ^^ { String($0) }).rep()
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: ["a"])
+        // NOTE: successful, as "b" is remaining input
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: [])
+    }
+
+    func testRepMinNoMax() {
+        let parser: Parser<[String], StringReader> =
+            (char("a") ^^ { String($0) }).rep(min: 2)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectSuccess(parser: parser,
+                      input: "aaa",
+                      expected: ["a", "a", "a"])
+    }
+
+    func testRepMinMax() {
+        let parser: Parser<[String], StringReader> =
+            (char("a") ^^ { String($0) }).rep(min: 2, max: 4)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaa",
+                      expected: ["a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaaa",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aaaaa",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "aab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+    }
+
+    func testTuples() {
+        let parser: Parser<String, StringReader> =
+            (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
+                let (open, inner, outer) = $0
+                return String([open] + inner + [outer])
+            }
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectSuccess(parser: parser,
+                      input: "()",
+                      expected: "()")
+        expectSuccess(parser: parser,
+                      input: "( )",
+                      expected: "( )")
+        expectSuccess(parser: parser,
+                      input: "(  )",
+                      expected: "(  )")
+    }
+
 //    func testRecursive() {
 //        let simple: Parser<String, StringReader> =
 //            (char("(") ~ char(")")) ^^^ "()"
@@ -317,10 +328,10 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testOr", testOr),
         ("testOrFirstSuccess", testOrFirstSuccess),
         ("testOpt", testOpt),
-//        ("testRepNoMinNoMax", testRepNoMinNoMax),
-//        ("testRepMinNoMax", testRepMinNoMax),
-//        ("testRepMinMax", testRepMinMax),
-//        ("testTuples", testTuples),
+        ("testRepNoMinNoMax", testRepNoMinNoMax),
+        ("testRepMinNoMax", testRepMinNoMax),
+        ("testRepMinMax", testRepMinMax),
+        ("testTuples", testTuples),
 //        ("testRecursive", testRecursive)
     ]
 }
