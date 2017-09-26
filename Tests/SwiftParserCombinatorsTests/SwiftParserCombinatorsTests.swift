@@ -9,7 +9,7 @@ extension String {
 
 class SwiftParserCombinatorsTests: XCTestCase {
 
-    func expectSuccess(parser: Parser<String, StringReader>, input: String, expected: String) {
+    func expectSuccess<T>(parser: Parser<T, StringReader>, input: String, expected: T) where T: Equatable {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -20,7 +20,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
-    func expectSuccess(parser: Parser<String?, StringReader>, input: String, expected: String?) {
+    func expectSuccess<T>(parser: Parser<T?, StringReader>, input: String, expected: T?) where T: Equatable {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -31,7 +31,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
-    func expectSuccess(parser: Parser<[String], StringReader>, input: String, expected: [String]) {
+    func expectSuccess<T>(parser: Parser<[T], StringReader>, input: String, expected: [T]) where T: Equatable {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -42,7 +42,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
-    func expectFailure(parser: Parser<String, StringReader>, input: String) {
+    func expectFailure<T>(parser: Parser<T, StringReader>, input: String) {
         let reader = StringReader(string: input)
         let result = parser.parse(reader)
         switch result {
@@ -55,30 +55,18 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
-    func expectFailure(parser: Parser<String?, StringReader>, input: String) {
-        let reader = StringReader(string: input)
-        let result = parser.parse(reader)
-        switch result {
-        case .success:
-            XCTFail("\(result) is successful")
-        case .failure:
-            break
-        case .error:
-            XCTFail("\(result) is error")
-        }
-    }
+    func testAccept() {
+        let parser: Parser<Character, StringReader> = char("a")
 
-    func expectFailure(parser: Parser<[String], StringReader>, input: String) {
-        let reader = StringReader(string: input)
-        let result = parser.parse(reader)
-        switch result {
-        case .success:
-            XCTFail("\(result) is successful")
-        case .failure:
-            break
-        case .error:
-            XCTFail("\(result) is error")
-        }
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: Character("a"))
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: " a")
     }
 
     func testMap() {
@@ -329,6 +317,11 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "((()")
         expectFailure(parser: parser,
                       input: "((())")
+
+        let long = String(repeating: "(", count: 10000)
+             + String(repeating: ")", count: 10000)
+
+        expectSuccess(parser: parser, input: long, expected: long)
     }
 
     static var allTests = [

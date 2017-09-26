@@ -1,5 +1,5 @@
 
-struct Lazy<T> {
+class Lazy<T> {
     let generate: () -> T
     lazy var value: T = {
         return self.generate()

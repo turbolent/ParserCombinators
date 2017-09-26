@@ -5,10 +5,9 @@ extension Parser {
         var p: Parser<T, Input>!
 
         p = generate(Parser { input in
-            p.parse(input)
+            p.step(input)
         })
 
         return p
     }
 }
-
