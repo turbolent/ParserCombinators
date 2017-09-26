@@ -2,8 +2,8 @@
 import Trampoline
 
 
-func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
-                      errorMessageSupplier: @escaping (Input.Element) -> String)
+public func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
+                            errorMessageSupplier: @escaping (Input.Element) -> String)
     -> Parser<Input.Element, Input>
 {
     return Parser { input in
@@ -25,14 +25,14 @@ func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
     }
 }
 
-func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input>
+public func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input>
     where Input.Element: Equatable
 {
     return acceptIf(predicate: { $0 == element },
                     errorMessageSupplier: { e in "expected \(element) but found \(e)" })
 }
 
-func char<Input>(_ char: Character) -> Parser<Character, Input>
+public func char<Input>(_ char: Character) -> Parser<Character, Input>
     where Input.Element == Character
 {
     return accept(element: char)

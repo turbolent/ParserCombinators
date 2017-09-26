@@ -2,16 +2,16 @@
 import Trampoline
 
 
-struct Parser<T, Input: Reader> {
-    typealias Result = ParseResult<T, Input>
+public struct Parser<T, Input: Reader> {
+    public typealias Result = ParseResult<T, Input>
 
-    let step: (Input) -> Trampoline<Result>
+    public let step: (Input) -> Trampoline<Result>
 
-    init(step: @escaping (Input) -> Trampoline<Result>) {
+    public init(step: @escaping (Input) -> Trampoline<Result>) {
         self.step = step
     }
 
-    func parse(_ input: Input) -> Result {
+    public func parse(_ input: Input) -> Result {
         return step(input).run()
     }
 }

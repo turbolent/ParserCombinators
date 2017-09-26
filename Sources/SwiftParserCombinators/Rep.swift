@@ -4,13 +4,15 @@ import Trampoline
 
 extension Parser {
 
-    func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Input> {
+    public func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Input> {
         return SwiftParserCombinators.rep(self, min: min, max: max)
     }
 }
 
 private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>, remaining: Input, elements: [T],
-                               n: Int, min: Int = 0, max: Int?) -> Trampoline<ParseResult<[T], Input>> {
+                               n: Int, min: Int = 0, max: Int?)
+    -> Trampoline<ParseResult<[T], Input>>
+{
     return More {
         if n == max {
             return Done(.success(value: elements, remaining: remaining))
@@ -42,8 +44,9 @@ private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>, remaining: In
 }
 
 
-func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>,
-                   min: Int = 0, max: Int? = nil) -> Parser<[T], Input>
+public func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>,
+                          min: Int = 0, max: Int? = nil)
+    -> Parser<[T], Input>
 {
     if let max = max, max == 0 {
         return success([])

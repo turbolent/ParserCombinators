@@ -1,6 +1,8 @@
+
 import Foundation
 
-protocol Reader {
+
+public protocol Reader {
     associatedtype Element
     associatedtype Offset: Comparable
     associatedtype Pos: Position
@@ -11,17 +13,19 @@ protocol Reader {
     var position: Pos { get }
 }
 
-protocol Position: CustomStringConvertible  {
+
+public protocol Position: CustomStringConvertible  {
     var column: Int { get }
     var lineContents: String { get }
 }
 
+
 extension Position {
-    var description: String {
+    public var description: String {
         return String(column)
     }
 
-    var longDescription: String {
+    public var longDescription: String {
         // TODO: replace with simpler version once >=4.0 
         // let prefix = lineContents.prefix(column)
         // let space = String(prefix.map { c in c == "\t" ? c : " " })

@@ -1,6 +1,7 @@
 
 import Trampoline
 
+
 /**
  A parse result can be either successful (`success`) or not.
  Non-successful results can be either failures (`failure`) or errors (`error`).
@@ -10,12 +11,12 @@ import Trampoline
  All results provide the remaining input to be parsed.
 */
 
-enum ParseResult<T, Input: Reader> {
+public enum ParseResult<T, Input: Reader> {
     case success(value: T, remaining: Input)
     case failure(message: String, remaining: Input)
     case error(message: String, remaining: Input)
 
-    func map<U>(_ f: (T) -> U) -> ParseResult<U, Input> {
+    public func map<U>(_ f: (T) -> U) -> ParseResult<U, Input> {
         switch self {
         case let .success(value, remaining):
             return .success(value: f(value), remaining: remaining)
@@ -28,7 +29,7 @@ enum ParseResult<T, Input: Reader> {
         }
     }
 
-    func flatMapWithNext<U>(_ f: (T) -> Parser<U, Input>) -> Trampoline<ParseResult<U, Input>> {
+    public func flatMapWithNext<U>(_ f: (T) -> Parser<U, Input>) -> Trampoline<ParseResult<U, Input>> {
         switch self {
         case let .success(value, remaining):
             return f(value).step(remaining)
@@ -43,7 +44,7 @@ enum ParseResult<T, Input: Reader> {
         }
     }
 
-    func append<U>(_ alternative: @autoclosure @escaping () -> Trampoline<ParseResult<U, Input>>)
+    public func append<U>(_ alternative: @autoclosure @escaping () -> Trampoline<ParseResult<U, Input>>)
         -> Trampoline<ParseResult<U, Input>>
     {
         switch self {
@@ -79,8 +80,9 @@ enum ParseResult<T, Input: Reader> {
     }
 }
 
+
 extension ParseResult: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         switch self {
         case let .success(value, remaining):
             return "[\(remaining.position)] parsed: \(value)"
@@ -95,19 +97,19 @@ extension ParseResult: CustomStringConvertible {
 }
 
 
-func success<T, Input>(_ value: T) -> Parser<T, Input> {
+public func success<T, Input>(_ value: T) -> Parser<T, Input> {
     return Parser { input in
         Done(.success(value: value, remaining: input))
     }
 }
 
-func failure<T, Input>(_ message: String) -> Parser<T, Input> {
+public func failure<T, Input>(_ message: String) -> Parser<T, Input> {
     return Parser { input in
         Done(.failure(message: message, remaining: input))
     }
 }
 
-func error<T, Input>(_ message: String) -> Parser<T, Input> {
+public func error<T, Input>(_ message: String) -> Parser<T, Input> {
     return Parser { input in
         Done(.error(message: message, remaining: input))
     }

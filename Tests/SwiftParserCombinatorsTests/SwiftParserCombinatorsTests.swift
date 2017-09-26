@@ -140,7 +140,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testOr() {
         let parser: Parser<String, StringReader> =
-            (char("a") | char("b")) ^^ { String($0) }
+            (char("a") || char("b")) ^^ { String($0) }
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -162,7 +162,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
             (char("a") ^^ { String($0) })
-            | ((char("a") ~ char("b")) ^^ String.init)
+            || ((char("a") ~ char("b")) ^^ String.init)
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -299,7 +299,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
                         let (_, inner, _) = $0
                         return "(\(inner))"
                     }
-                return simple | nested
+                return simple || nested
             }
 
         expectSuccess(parser: parser,
@@ -318,8 +318,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectFailure(parser: parser,
                       input: "((())")
 
-        let long = String(repeating: "(", count: 10000)
-             + String(repeating: ")", count: 10000)
+        let longCount = 10000
+        let long = String(repeating: "(", count: longCount)
+             + String(repeating: ")", count: longCount)
 
         expectSuccess(parser: parser, input: long, expected: long)
     }
