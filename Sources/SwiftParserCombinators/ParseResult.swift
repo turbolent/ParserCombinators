@@ -43,41 +43,6 @@ public enum ParseResult<T, Input: Reader> {
             return Done(.error(message: message, remaining: remaining))
         }
     }
-
-    public func append<U>(_ alternative: @autoclosure @escaping () -> Trampoline<ParseResult<U, Input>>)
-        -> Trampoline<ParseResult<U, Input>>
-    {
-        switch self {
-        case let .success(value, remaining):
-            // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here.
-            // Furthermore it is not possible in Swift constrain U to be a supertype of T
-            return Done(.success(value: value as! U, remaining: remaining))
-
-        case let .error(message, remaining):
-            // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here.
-            return Done(.error(message: message, remaining: remaining))
-
-        case let .failure(message, remaining):
-            return More(alternative).map { alt in
-                switch alt {
-                case .success:
-                    return alt
-                case .failure(_, let altRemaining):
-                    if altRemaining.offset < remaining.offset {
-                        // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
-                        return .failure(message: message, remaining: remaining)
-                    }
-                    return alt
-                case .error(_, let altRemaining):
-                    if altRemaining.offset < remaining.offset {
-                        // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
-                        return .error(message: message, remaining: remaining)
-                    }
-                    return alt
-                }
-            }
-        }
-    }
 }
 
 
