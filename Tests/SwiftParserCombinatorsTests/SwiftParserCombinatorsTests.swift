@@ -325,6 +325,41 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser, input: long, expected: long)
     }
 
+    func testNot() {
+        let parser: Parser<Bool, StringReader> = not(char("a")) ^^^ true
+
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "aa")
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "ba",
+                      expected: true)
+    }
+
+    func testGuard() {
+        let parser: Parser<Bool, StringReader> = `guard`(char("a")) ^^^ true
+
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: true)
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "ba")
+    }
+
     static var allTests = [
         ("testMap", testMap),
         ("testMapValue", testMapValue),
@@ -338,6 +373,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepMinNoMax", testRepMinNoMax),
         ("testRepMinMax", testRepMinMax),
         ("testTuples", testTuples),
-        ("testRecursive", testRecursive)
+        ("testRecursive", testRecursive),
+        ("testNot", testNot),
+        ("testGuard", testGuard)
     ]
 }
