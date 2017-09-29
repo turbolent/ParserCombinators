@@ -5,6 +5,19 @@ extension String {
     init(tuple: (Character, Character)) {
         self.init([tuple.0, tuple.1])
     }
+
+    init(tuple: (Character, Character, Character)) {
+        self.init([tuple.0, tuple.1, tuple.2])
+    }
+
+    init(tuple: (Character, Character, Character, Character)) {
+        self.init([tuple.0, tuple.1, tuple.2, tuple.3])
+    }
+
+    init(tuple: (Character, Character, Character, Character, Character)) {
+        self.init([tuple.0, tuple.1, tuple.2, tuple.3, tuple.4])
+    }
+
 }
 
 class SwiftParserCombinatorsTests: XCTestCase {
@@ -105,6 +118,73 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectFailure(parser: parser,
                       input: "ba")
     }
+
+    func testSeq3() {
+        let parser: Parser<String, StringReader> =
+            (char("a") ~ char("b") ~ char("c")) ^^ String.init
+
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "abc")
+        expectSuccess(parser: parser,
+                      input: "abcd",
+                      expected: "abc")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "cba")
+    }
+
+    func testSeq4() {
+        let parser: Parser<String, StringReader> =
+            (char("a") ~ char("b") ~ char("c") ~ char("d")) ^^ String.init
+
+        expectSuccess(parser: parser,
+                      input: "abcd",
+                      expected: "abcd")
+        expectSuccess(parser: parser,
+                      input: "abcde",
+                      expected: "abcd")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectFailure(parser: parser,
+                      input: "abc")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "dcba")
+    }
+
+    func testSeq5() {
+        let parser: Parser<String, StringReader> =
+            (char("a") ~ char("b") ~ char("c") ~ char("d") ~ char("e")) ^^ String.init
+
+        expectSuccess(parser: parser,
+                      input: "abcde",
+                      expected: "abcde")
+        expectSuccess(parser: parser,
+                      input: "abcdef",
+                      expected: "abcde")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectFailure(parser: parser,
+                      input: "abc")
+        expectFailure(parser: parser,
+                      input: "abcd")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "edcba")
+    }
+
 
     func testSeqIgnoreLeft() {
         let parser: Parser<String, StringReader> =
@@ -364,6 +444,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testMap", testMap),
         ("testMapValue", testMapValue),
         ("testSeq", testSeq),
+        ("testSeq3", testSeq3),
+        ("testSeq4", testSeq4),
+        ("testSeq5", testSeq5),
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
         ("testOr", testOr),
