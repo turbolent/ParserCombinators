@@ -2,7 +2,7 @@
 extension Parser {
 
     // Create a parser which sequentially composes another parser.
-    // In case of failure,  back-tracking
+    // In case of failure, no back-tracking is performed
     public func seqCommit<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
         -> Parser<(T, U), Input>
     {
