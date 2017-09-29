@@ -68,6 +68,19 @@ class SwiftParserCombinatorsTests: XCTestCase {
         }
     }
 
+    func expectError<T>(parser: Parser<T, StringReader>, input: String) {
+        let reader = StringReader(string: input)
+        let result = parser.parse(reader)
+        switch result {
+        case .success:
+            XCTFail("\(result) is successful")
+        case .failure:
+            XCTFail("\(result) is failure")
+        case .error:
+            break
+        }
+    }
+
     func testAccept() {
         let parser: Parser<Character, StringReader> = char("a")
 
@@ -347,6 +360,43 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "ab")
     }
 
+    func testRepZeroMax() {
+        let parser: Parser<[Character], StringReader> =
+            char("a").rep(max: 0)
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: [])
+    }
+
+    func testRepError() {
+        let parser: Parser<[String], StringReader> =
+            commit(char("a") ^^ String.init).rep(min: 1)
+
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "aba",
+                      expected: ["a"])
+        expectError(parser: parser,
+                    input: "")
+        expectError(parser: parser,
+                    input: "b")
+    }
+
     func testTuples() {
         let parser: Parser<String, StringReader> =
             (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
@@ -455,6 +505,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepNoMinNoMax", testRepNoMinNoMax),
         ("testRepMinNoMax", testRepMinNoMax),
         ("testRepMinMax", testRepMinMax),
+        ("testRepZeroMax", testRepZeroMax),
+        ("testRepError", testRepError),
         ("testTuples", testTuples),
         ("testRecursive", testRecursive),
         ("testNot", testNot),
