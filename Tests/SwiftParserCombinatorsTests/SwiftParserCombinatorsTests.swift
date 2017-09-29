@@ -456,38 +456,49 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testNot() {
-        let parser: Parser<Bool, StringReader> = not(char("a")) ^^^ true
 
-        expectFailure(parser: parser,
-                      input: "a")
-        expectFailure(parser: parser,
-                      input: "aa")
-        expectSuccess(parser: parser,
-                      input: "",
-                      expected: true)
-        expectSuccess(parser: parser,
-                      input: "b",
-                      expected: true)
-        expectSuccess(parser: parser,
-                      input: "ba",
-                      expected: true)
+        let parsers: [Parser<Bool, StringReader>] = [
+            not(char("a")) ^^^ true,
+            char("a").not() ^^^ true
+        ]
+
+        for parser in parsers {
+            expectFailure(parser: parser,
+                          input: "a")
+            expectFailure(parser: parser,
+                          input: "aa")
+            expectSuccess(parser: parser,
+                          input: "",
+                          expected: true)
+            expectSuccess(parser: parser,
+                          input: "b",
+                          expected: true)
+            expectSuccess(parser: parser,
+                          input: "ba",
+                          expected: true)
+        }
     }
 
     func testGuard() {
-        let parser: Parser<Bool, StringReader> = `guard`(char("a")) ^^^ true
+        let parsers: [Parser<Bool, StringReader>] = [
+            `guard`(char("a")) ^^^ true,
+            char("a").`guard`() ^^^ true
+        ]
 
-        expectSuccess(parser: parser,
-                      input: "a",
-                      expected: true)
-        expectSuccess(parser: parser,
-                      input: "aa",
-                      expected: true)
-        expectFailure(parser: parser,
-                      input: "")
-        expectFailure(parser: parser,
-                      input: "b")
-        expectFailure(parser: parser,
-                      input: "ba")
+        for parser in parsers {
+            expectSuccess(parser: parser,
+                          input: "a",
+                          expected: true)
+            expectSuccess(parser: parser,
+                          input: "aa",
+                          expected: true)
+            expectFailure(parser: parser,
+                          input: "")
+            expectFailure(parser: parser,
+                          input: "b")
+            expectFailure(parser: parser,
+                          input: "ba")
+        }
     }
 
     static var allTests = [
