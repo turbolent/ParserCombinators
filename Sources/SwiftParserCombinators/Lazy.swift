@@ -1,11 +1,12 @@
 
-class Lazy<T> {
-    let generate: () -> T
-    lazy var value: T = {
+internal class Lazy<T> {
+    private let generate: () -> T
+
+    internal lazy var value: T = {
         return self.generate()
     }()
 
-    init(_ generate: @escaping () -> T) {
+    internal init(_ generate: @escaping () -> T) {
         self.generate = generate
     }
 }

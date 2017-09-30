@@ -16,6 +16,17 @@ public enum ParseResult<T, Input: Reader> {
     case failure(message: String, remaining: Input)
     case error(message: String, remaining: Input)
 
+    var remaining: Input {
+        switch self {
+        case .success(_, let remaining):
+            return remaining
+        case .failure(_, let remaining):
+            return remaining
+        case .error(_, let remaining):
+            return remaining
+        }
+    }
+
     public func map<U>(_ f: (T) -> U) -> ParseResult<U, Input> {
         switch self {
         case let .success(value, remaining):

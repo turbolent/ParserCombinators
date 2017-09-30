@@ -125,6 +125,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "abc",
                       expected: "ab")
         expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
                       input: "a")
         expectFailure(parser: parser,
                       input: "b")
@@ -142,6 +144,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser,
                       input: "abcd",
                       expected: "abc")
+        expectFailure(parser: parser,
+                      input: "")
         expectFailure(parser: parser,
                       input: "a")
         expectFailure(parser: parser,
@@ -162,6 +166,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser,
                       input: "abcde",
                       expected: "abcd")
+        expectFailure(parser: parser,
+                      input: "")
         expectFailure(parser: parser,
                       input: "a")
         expectFailure(parser: parser,
@@ -185,6 +191,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "abcdef",
                       expected: "abcde")
         expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
                       input: "a")
         expectFailure(parser: parser,
                       input: "ab")
@@ -203,6 +211,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         let parser: Parser<String, StringReader> =
             (char("a") ~> char("b")) ^^ String.init
 
+        expectFailure(parser: parser,
+                      input: "")
         expectSuccess(parser: parser,
                       input: "ab",
                       expected: "b")
@@ -219,6 +229,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         let parser: Parser<String, StringReader> =
             (char("a") <~ char("b")) ^^ String.init
 
+        expectFailure(parser: parser,
+                      input: "")
         expectSuccess(parser: parser,
                       input: "ab",
                       expected: "a")
@@ -235,6 +247,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         let parser: Parser<String, StringReader> =
             (char("a") || char("b")) ^^ String.init
 
+        expectFailure(parser: parser,
+                      input: "")
         expectSuccess(parser: parser,
                       input: "a",
                       expected: "a")
@@ -252,11 +266,29 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: "a")
     }
 
+    func testCommitOr() {
+        let parser: Parser<String, StringReader> =
+            ((char("a") ~ commit(char("b")))
+                || (char("a") ~ char("c"))) ^^ String.init
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectError(parser: parser,
+                    input: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectError(parser: parser,
+                    input: "ac")
+    }
+
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
             (char("a") ^^ String.init)
-            || ((char("a") ~ char("b")) ^^ String.init)
+                || ((char("a") ~ char("b")) ^^ String.init)
 
+        expectFailure(parser: parser,
+                      input: "")
         expectSuccess(parser: parser,
                       input: "a",
                       expected: "a")
@@ -268,6 +300,44 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       expected: "a")
     }
 
+    func testOrLonger() {
+        let parser: Parser<String, StringReader> =
+            (char("a") ^^ String.init)
+                ||| ((char("a") ~ char("b")) ^^ String.init)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "ab")
+    }
+
+    func testCommitOrLonger() {
+        let parser: Parser<String, StringReader> =
+            (commit(char("a")) ^^ String.init)
+                ||| ((char("a") ~ char("b")) ^^ String.init)
+
+        expectError(parser: parser,
+                    input: "")
+        expectError(parser: parser,
+                    input: "b")
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "ab")
+    }
+
     func testOpt() {
         let parser: Parser<String?, StringReader> =
             (char("a") ^^ String.init).opt()
@@ -275,11 +345,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser,
                       input: "a",
                       expected: "a")
-
         expectSuccess(parser: parser,
                       input: "ab",
                       expected: "a")
-
         expectSuccess(parser: parser,
                       input: "",
                       expected: nil)
@@ -511,7 +579,10 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testSeqIgnoreLeft", testSeqIgnoreLeft),
         ("testSeqIgnoreRight", testSeqIgnoreRight),
         ("testOr", testOr),
+        ("testCommitOr", testCommitOr),
         ("testOrFirstSuccess", testOrFirstSuccess),
+        ("testOrLonger", testOrLonger),
+        ("testCommitOrLonger", testCommitOrLonger),
         ("testOpt", testOpt),
         ("testRepNoMinNoMax", testRepNoMinNoMax),
         ("testRepMinNoMax", testRepMinNoMax),
