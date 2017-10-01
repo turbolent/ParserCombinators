@@ -76,8 +76,8 @@ public func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
 
 infix operator <~ : ApplicativeSequencePrecedence
 
-func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                      rhs: @autoclosure @escaping () -> Parser<U, Input>)
+public func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<T, Input>
 {
     return lhs().seqIgnoreRight(rhs())

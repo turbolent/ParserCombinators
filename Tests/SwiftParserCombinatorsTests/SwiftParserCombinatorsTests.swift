@@ -1,5 +1,5 @@
 import XCTest
-@testable import SwiftParserCombinators
+import SwiftParserCombinators
 
 extension String {
     init(tuple: (Character, Character)) {
