@@ -25,7 +25,15 @@ public func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
     }
 }
 
-public func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input>
+public func elem<Input>(kind: String, predicate: @escaping (Input.Element) -> Bool)
+    -> Parser<Input.Element, Input>
+    where Input.Element: Equatable
+{
+    return acceptIf(predicate: predicate,
+                    errorMessageSupplier: { e in "\(kind) expected" })
+}
+
+public func accept<Input>(_ element: Input.Element) -> Parser<Input.Element, Input>
     where Input.Element: Equatable
 {
     return acceptIf(predicate: { $0 == element },
@@ -35,5 +43,5 @@ public func accept<Input>(element: Input.Element) -> Parser<Input.Element, Input
 public func char<Input>(_ char: Character) -> Parser<Character, Input>
     where Input.Element == Character
 {
-    return accept(element: char)
+    return accept(char)
 }
