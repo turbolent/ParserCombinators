@@ -6,7 +6,7 @@ extension Parser {
     public func seqCommit<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
         -> Parser<(T, U), Input>
     {
-        let lazyNext = Lazy({ commit(next()) })
+        let lazyNext = Lazy({ commit(next) })
         return flatMap { firstResult in
             lazyNext.value.map { secondResult in
                 (firstResult, secondResult)

@@ -38,28 +38,28 @@ public func ~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<(T, U), Input>
 {
-    return lhs().seq(rhs())
+    return lhs().seq(rhs)
 }
 
 public func ~ <T, U, V, Input>(lhs: @autoclosure () -> Parser<(T, U), Input>,
                                rhs: @autoclosure @escaping () -> Parser<V, Input>)
     -> Parser<(T, U, V), Input>
 {
-    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.1) }
+    return lhs().seq(rhs).map { ($0.0.0, $0.0.1, $0.1) }
 }
 
 public func ~ <T, U, V, W, Input>(lhs: @autoclosure () -> Parser<(T, U, V), Input>,
                                   rhs: @autoclosure @escaping () -> Parser<W, Input>)
     -> Parser<(T, U, V, W), Input>
 {
-    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
+    return lhs().seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
 }
 
 public func ~ <T, U, V, W, X, Input>(lhs: @autoclosure () -> Parser<(T, U, V, W), Input>,
                                      rhs: @autoclosure @escaping () -> Parser<X, Input>)
     -> Parser<(T, U, V, W, X), Input>
 {
-    return lhs().seq(rhs()).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
+    return lhs().seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
 }
 
 
@@ -71,7 +71,7 @@ public func ~> <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                              rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<U, Input>
 {
-    return lhs().seqIgnoreLeft(rhs())
+    return lhs().seqIgnoreLeft(rhs)
 }
 
 infix operator <~ : ApplicativeSequencePrecedence
@@ -80,5 +80,5 @@ public func <~ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                              rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<T, Input>
 {
-    return lhs().seqIgnoreRight(rhs())
+    return lhs().seqIgnoreRight(rhs)
 }

@@ -106,7 +106,7 @@ public func || <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                              rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<U, Input>
 {
-    return lhs().or(rhs())
+    return lhs().or(rhs)
 }
 
 
@@ -117,7 +117,7 @@ public func ||| <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                               rhs: @autoclosure @escaping () -> Parser<U, Input>)
     -> Parser<U, Input>
 {
-    return lhs().orLonger(rhs())
+    return lhs().orLonger(rhs)
 }
 
 

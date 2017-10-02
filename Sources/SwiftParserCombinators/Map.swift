@@ -39,5 +39,5 @@ public func ^^^ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
                               rhs: @autoclosure @escaping () -> U)
     -> Parser<U, Input>
 {
-    return lhs().map(rhs())
+    return lhs().map(rhs)
 }
