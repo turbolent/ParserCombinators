@@ -3,7 +3,7 @@ import Trampoline
 
 
 extension Parser {
-    public func map<U>(_ f: @escaping (T) -> U) -> Parser<U, Input> {
+    public func map<U>(_ f: @escaping (T) throws -> U) -> Parser<U, Input> {
         return Parser<U, Input> { input in
             self.step(input).map { $0.map(f) }
         }
@@ -27,7 +27,7 @@ extension Parser {
 infix operator ^^ : ApplicativePrecedence
 
 public func ^^ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
-                             rhs: @escaping (T) -> U)
+                             rhs: @escaping (T) throws -> U)
     -> Parser<U, Input>
 {
     return lhs().map(rhs)

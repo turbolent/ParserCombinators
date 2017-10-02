@@ -1,6 +1,11 @@
 
 import Trampoline
 
+public enum MapError: Error {
+    case failure(String)
+    case error(String)
+}
+
 
 /**
  A parse result can be either successful (`success`) or not.
@@ -27,10 +32,20 @@ public enum ParseResult<T, Input: Reader> {
         }
     }
 
-    public func map<U>(_ f: (T) -> U) -> ParseResult<U, Input> {
+    public func map<U>(_ f: (T) throws -> U) -> ParseResult<U, Input> {
         switch self {
         case let .success(value, remaining):
-            return .success(value: f(value), remaining: remaining)
+            do {
+                let newValue = try f(value)
+                return .success(value: newValue, remaining: remaining)
+            } catch MapError.failure(let message)  {
+                return .failure(message: message, remaining: remaining)
+            } catch MapError.error(let message) {
+                return .error(message: message, remaining: remaining)
+            } catch let error {
+                return .failure(message: "map failed with error: \(error)",
+                                remaining: remaining)
+            }
         case let .failure(message, remaining):
             // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `self` here
             return .failure(message: message, remaining: remaining)
