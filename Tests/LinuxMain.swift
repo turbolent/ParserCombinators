@@ -3,4 +3,5 @@ import XCTest
 
 XCTMain([
     testCase(SwiftParserCombinatorsTests.allTests),
+    testCase(JSONParserTests.allTests)
 ])
