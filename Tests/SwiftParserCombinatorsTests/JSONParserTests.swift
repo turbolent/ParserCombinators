@@ -7,8 +7,7 @@ import SwiftParserCombinators
 indirect enum JSON {
     case null
     case string(String)
-    case double(Double)
-    case int(Int)
+    case number(Double)
     case bool(Bool)
     case object([(String, JSON)])
     case array([JSON])
@@ -23,9 +22,7 @@ func ==(lhs: JSON, rhs: JSON) -> Bool {
         return true
     case (.string(let a), .string(let b)):
         return a == b
-    case (.double(let a), .double(let b)):
-        return a == b
-    case (.int(let a), .int(let b)):
+    case (.number(let a), .number(let b)):
         return a == b
     case (.bool(let a), .bool(let b)):
         return a == b
@@ -176,10 +173,10 @@ class JSONParser<Input: Reader> where Input.Element == Character {
         return opt(char("-") ^^ String.init) ~ intPart() ~ opt(fracPart()) ~ opt(expPart()) ^^ {
             let (minus, intPart, fracPart, expPart) = $0
             let value = optString("", minus) + intPart + optString(".", fracPart) + optString("", expPart)
-            guard let int = Int(value) else {
+            guard let double = Double(value) else {
                 throw MapError.failure("Invalid number: \(value)")
             }
-            return .int(int)
+            return .number(double)
         }
     }
 
@@ -262,13 +259,13 @@ class JSONParserTests: XCTestCase {
 
     func testJSON() {
         expectSuccess(parser: JSONParser<StringReader>.json(),
-                      input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42}]] ",
+                      input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] ",
                       expected: JSON.array([.null, .bool(true), .bool(false), .string("test"),
                                             .array([.object([]),
                                                     .object([]),
                                                     .object([
                                                         (" ", .string("23")),
-                                                        ("", .int(42))
+                                                        ("", .number(42.23))
                                                         ])])]))
     }
 
