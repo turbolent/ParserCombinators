@@ -32,7 +32,7 @@ extension Position {
         
         let line = lineContents
         let index = line.index(line.startIndex, offsetBy: column, limitedBy: line.endIndex) ?? line.endIndex
-        let prefix = line.substring(to: index)        
+        let prefix = line.substring(to: index)
         let space = String(prefix.characters.map { c in c == "\t" ? c : " " })
 
         return lineContents + "\n\(space)^"

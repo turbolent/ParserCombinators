@@ -72,20 +72,20 @@ class JSONParser<Input: Reader> where Input.Element == Character {
                 return .bool(true)
             case "null":
                 return .null
-            case let x:
-                throw MapError.failure("invalid characters: \(x)")
+            case let letters:
+                throw MapError.failure("invalid characters: \(letters)")
             }
         }
     }
 
     static func objectValue() -> JSONParser {
         let keyValue = withWhitespace(string()) ~ (structureChar(":") ~> json())
-        let content = rep(keyValue, separator: char(",")) ^^ { JSON.object($0) }
+        let content = rep(keyValue, separator: char(",")) ^^ JSON.object
         return structure(start: "{", content: content, end: "}")
     }
 
     static func arrayValue() -> JSONParser {
-        let content = rep(json(), separator: char(",")) ^^ { JSON.array($0) }
+        let content = rep(json(), separator: char(",")) ^^ JSON.array
         return structure(start: "[", content: content, end: "]")
     }
 
@@ -164,7 +164,7 @@ class JSONParser<Input: Reader> where Input.Element == Character {
     }
 
     static func stringValue() -> JSONParser {
-        return string() ^^ { .string($0) }
+        return string() ^^ JSON.string
     }
 
     static func string() -> StringParser {

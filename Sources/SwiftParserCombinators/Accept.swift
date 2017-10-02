@@ -45,3 +45,4 @@ public func char<Input>(_ char: Character) -> Parser<Character, Input>
 {
     return accept(char)
 }
+
