@@ -465,6 +465,101 @@ class SwiftParserCombinatorsTests: XCTestCase {
                     input: "b")
     }
 
+    func testRepSepNoMinNoMax() {
+        let parser: Parser<[Character], StringReader> =
+            char("a").rep(separator: char(","))
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "a,a",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: ["a"])
+        expectSuccess(parser: parser,
+                      input: "a,ab",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,a,b",
+                      expected: ["a", "a"])
+        // NOTE: successful, as "b" is remaining input
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: [])
+    }
+
+    func testRepSepMinNoMax() {
+        let parser: Parser<[String], StringReader> =
+            (char("a") ^^ String.init)
+                .rep(separator: char(","),
+                     min: 2)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "a,a",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,ab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+        expectSuccess(parser: parser,
+                      input: "a,a,a",
+                      expected: ["a", "a", "a"])
+    }
+
+    func testRepSepMinMax() {
+        let parser: Parser<[String], StringReader> =
+            (char("a") ^^ String.init)
+                .rep(separator: char(","),
+                     min: 2, max: 4)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "a,a",
+                      expected: ["a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,a,a",
+                      expected: ["a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,a,a,a",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,a,a,a,a",
+                      expected: ["a", "a", "a", "a"])
+        expectSuccess(parser: parser,
+                      input: "a,ab",
+                      expected: ["a", "a"])
+        expectFailure(parser: parser,
+                      input: "ab")
+    }
+
+    func testRepSepZeroMax() {
+        let parser: Parser<[Character], StringReader> =
+            char("a").rep(separator: char(","), max: 0)
+
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: [])
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: [])
+    }
+
     func testTuples() {
         let parser: Parser<String, StringReader> =
             (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
@@ -589,6 +684,10 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepMinMax", testRepMinMax),
         ("testRepZeroMax", testRepZeroMax),
         ("testRepError", testRepError),
+        ("testRepSepNoMinNoMax", testRepSepNoMinNoMax),
+        ("testRepSepMinNoMax", testRepSepMinNoMax),
+        ("testRepSepMinMax", testRepSepMinMax),
+        ("testRepSepZeroMax", testRepSepZeroMax),
         ("testTuples", testTuples),
         ("testRecursive", testRecursive),
         ("testNot", testNot),

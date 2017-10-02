@@ -8,5 +8,6 @@ extension Parser {
 
 
 public func opt<T, Input>(_ parser: @autoclosure () -> Parser<T, Input>) -> Parser<T?, Input> {
-    return parser().map { $0 } || success(nil)
+    return parser().map { $0 }
+        || success(nil)
 }
