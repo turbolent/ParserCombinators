@@ -5,12 +5,12 @@ import Foundation
 public protocol Reader {
     associatedtype Element
     associatedtype Offset: Comparable
-    associatedtype Pos: Position
+    associatedtype Position: SwiftParserCombinators.Position
     var atEnd: Bool { get }
     var first: Element { get }
     var rest: Self { get }
     var offset: Offset { get }
-    var position: Pos { get }
+    var position: Position { get }
 }
 
 
