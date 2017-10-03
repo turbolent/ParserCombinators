@@ -36,6 +36,21 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: " a")
     }
 
+    func testLiteral() {
+        let parser: Parser<String, StringReader> = literal("test")
+
+        expectSuccess(parser: parser,
+                      input: "test",
+                      expected: "test")
+        expectSuccess(parser: parser,
+                      input: "testing",
+                      expected: "test")
+        expectFailure(parser: parser,
+                      input: "atest")
+        expectFailure(parser: parser,
+                      input: " test")
+    }
+
     func testMap() {
         let parser: Parser<String, StringReader> =
             char("a") ^^ { String($0).uppercased() }
@@ -598,6 +613,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     static var allTests = [
+        ("testAccept", testAccept),
+        ("testLiteral", testLiteral),
         ("testMap", testMap),
         ("testMapValue", testMapValue),
         ("testSeq", testSeq),

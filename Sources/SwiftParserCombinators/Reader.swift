@@ -13,6 +13,26 @@ public protocol Reader {
     var position: Position { get }
 }
 
+public enum ReaderError: Error {
+    case endOfFile
+}
+
+
+extension Reader {
+    public func read(count: Int) throws -> ([Element], Self) {
+        var elements: [Element] = []
+        var reader = self
+        for _ in 0..<count {
+            guard !reader.atEnd else {
+                throw ReaderError.endOfFile
+            }
+
+            elements.append(reader.first)
+            reader = reader.rest
+        }
+        return (elements, reader)
+    }
+}
 
 public protocol Position: CustomStringConvertible  {
     var column: Int { get }
