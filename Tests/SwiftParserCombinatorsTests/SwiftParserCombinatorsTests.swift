@@ -559,50 +559,42 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser, input: long, expected: long)
     }
 
-    func testNot() {
+    func testNotFollowedBy() {
 
-        let parsers: [Parser<Bool, StringReader>] = [
-            not(char("a")) ^^^ true,
-            char("a").not() ^^^ true
-        ]
+        let parser: Parser<Bool, StringReader> =
+            notFollowedBy(char("a")) ^^^ true
 
-        for parser in parsers {
-            expectFailure(parser: parser,
-                          input: "a")
-            expectFailure(parser: parser,
-                          input: "aa")
-            expectSuccess(parser: parser,
-                          input: "",
-                          expected: true)
-            expectSuccess(parser: parser,
-                          input: "b",
-                          expected: true)
-            expectSuccess(parser: parser,
-                          input: "ba",
-                          expected: true)
-        }
+        expectFailure(parser: parser,
+                      input: "a")
+        expectFailure(parser: parser,
+                      input: "aa")
+        expectSuccess(parser: parser,
+                      input: "",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "ba",
+                      expected: true)
     }
 
-    func testGuard() {
-        let parsers: [Parser<Bool, StringReader>] = [
-            `guard`(char("a")) ^^^ true,
-            char("a").`guard`() ^^^ true
-        ]
+    func testFollowedBy() {
+        let parser: Parser<Bool, StringReader> =
+            followedBy(char("a")) ^^^ true
 
-        for parser in parsers {
-            expectSuccess(parser: parser,
-                          input: "a",
-                          expected: true)
-            expectSuccess(parser: parser,
-                          input: "aa",
-                          expected: true)
-            expectFailure(parser: parser,
-                          input: "")
-            expectFailure(parser: parser,
-                          input: "b")
-            expectFailure(parser: parser,
-                          input: "ba")
-        }
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: true)
+        expectSuccess(parser: parser,
+                      input: "aa",
+                      expected: true)
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: "ba")
     }
 
     static var allTests = [
@@ -631,7 +623,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepSepZeroMax", testRepSepZeroMax),
         ("testTuples", testTuples),
         ("testRecursive", testRecursive),
-        ("testNot", testNot),
-        ("testGuard", testGuard)
+        ("testNotFollowedBy", testNotFollowedBy),
+        ("testFollowedBy", testFollowedBy)
     ]
 }
