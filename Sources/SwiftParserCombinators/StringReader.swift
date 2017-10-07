@@ -1,54 +1,58 @@
 
 public struct StringReader: Reader {
-
-    private let characters: String.CharacterView
-    private let index: String.CharacterView.Index
+    private let string: String
+    private let index: String.Index
 
     public init(string: String) {
-        self.init(characters: string.characters,
-                  index: string.characters.startIndex)
+        self.init(string: string,
+                  index: string.startIndex)
     }
 
-    private init(characters: String.CharacterView,
-                 index: String.CharacterView.Index)
+    private init(string: String,
+                 index: String.Index)
     {
-        self.characters = characters
+        self.string = string
         self.index = index
     }
 
     public var atEnd: Bool {
-        return index >= characters.endIndex
+        return index >= string.endIndex
     }
 
     public var first: Character {
-        return characters[index]
+        return string[index]
     }
 
     public var rest: StringReader {
-        return StringReader(characters: characters,
-                            index: characters.index(after: index))
+        return StringReader(string: string,
+                            index: string.index(after: index))
     }
 
-    public var offset: String.CharacterView.Index {
+    public var offset: String.Index {
         return index
     }
 
     public var position: StringPosition {
-        return StringPosition(characters: characters,
+        return StringPosition(string: string,
                               index: index)
     }
 }
 
+extension String.Index: Hashable {
+    public var hashValue: Int {
+        return encodedOffset
+    }
+}
 
 public struct StringPosition: Position {
-    public let characters: String.CharacterView
-    public let index: String.CharacterView.Index
+    public let string: String
+    public let index: String.Index
 
     public var lineContents: String {
-        return String(characters)
+        return string
     }
 
     public var column: Int {
-        return characters.distance(from: characters.startIndex, to: index) + 1
+        return string.distance(from: string.startIndex, to: index) + 1
     }
 }

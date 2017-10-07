@@ -46,15 +46,8 @@ extension Position {
     }
 
     public var longDescription: String {
-        // TODO: replace with simpler version once >=4.0 
-        // let prefix = lineContents.prefix(column)
-        // let space = String(prefix.map { c in c == "\t" ? c : " " })
-        
-        let line = lineContents
-        let index = line.index(line.startIndex, offsetBy: column, limitedBy: line.endIndex) ?? line.endIndex
-        let prefix = line.substring(to: index)
-        let space = String(prefix.characters.map { c in c == "\t" ? c : " " })
-
+        let prefix = lineContents.prefix(column)
+        let space = String(prefix.map { c in c == "\t" ? c : " " })
         return lineContents + "\n\(space)^"
     }
 }
