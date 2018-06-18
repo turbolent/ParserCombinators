@@ -26,18 +26,18 @@ extension Parser {
 
 infix operator ^^ : ApplicativePrecedence
 
-public func ^^ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+public func ^^ <T, U, Input>(lhs: Parser<T, Input>,
                              rhs: @escaping (T) throws -> U)
     -> Parser<U, Input>
 {
-    return lhs().map(rhs)
+    return lhs.map(rhs)
 }
 
 infix operator ^^^ : ApplicativePrecedence
 
-public func ^^^ <T, U, Input>(lhs: @autoclosure () -> Parser<T, Input>,
+public func ^^^ <T, U, Input>(lhs: Parser<T, Input>,
                               rhs: @autoclosure @escaping () -> U)
     -> Parser<U, Input>
 {
-    return lhs().map(rhs)
+    return lhs.map(rhs)
 }
