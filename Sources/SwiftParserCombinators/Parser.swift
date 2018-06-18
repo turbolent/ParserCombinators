@@ -2,7 +2,7 @@
 import Trampoline
 
 
-public struct Parser<T, Input: Reader> {
+public class Parser<T, Input: Reader> {
     public typealias Result = ParseResult<T, Input>
 
     public let step: (Input) -> Trampoline<Result>
