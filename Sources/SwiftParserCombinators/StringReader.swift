@@ -38,12 +38,6 @@ public struct StringReader: Reader {
     }
 }
 
-extension String.Index: Hashable {
-    public var hashValue: Int {
-        return encodedOffset
-    }
-}
-
 public struct StringPosition: Position {
     public let string: String
     public let index: String.Index
