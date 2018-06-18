@@ -1,23 +1,10 @@
 import XCTest
 import SwiftParserCombinators
 
-extension String {
-    init(tuple: (Character, Character)) {
-        self.init([tuple.0, tuple.1])
+extension Parser where T == [Character] {
+    var stringParser: Parser<String, Input> {
+        return self ^^ { String($0) }
     }
-
-    init(tuple: (Character, Character, Character)) {
-        self.init([tuple.0, tuple.1, tuple.2])
-    }
-
-    init(tuple: (Character, Character, Character, Character)) {
-        self.init([tuple.0, tuple.1, tuple.2, tuple.3])
-    }
-
-    init(tuple: (Character, Character, Character, Character, Character)) {
-        self.init([tuple.0, tuple.1, tuple.2, tuple.3, tuple.4])
-    }
-
 }
 
 class SwiftParserCombinatorsTests: XCTestCase {
@@ -72,7 +59,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeq() {
         let parser: Parser<String, StringReader> =
-            (char("a") ~ char("b")) ^^ String.init
+            (char("a") ~ char("b")).stringParser
 
         expectSuccess(parser: parser,
                       input: "ab",
@@ -92,7 +79,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeq3() {
         let parser: Parser<String, StringReader> =
-            (char("a") ~ char("b") ~ char("c")) ^^ String.init
+            (char("a") ~ char("b") ~ char("c")).stringParser
 
         expectSuccess(parser: parser,
                       input: "abc",
@@ -114,7 +101,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeq4() {
         let parser: Parser<String, StringReader> =
-            (char("a") ~ char("b") ~ char("c") ~ char("d")) ^^ String.init
+            (char("a") ~ char("b") ~ char("c") ~ char("d")).stringParser
 
         expectSuccess(parser: parser,
                       input: "abcd",
@@ -138,7 +125,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testSeq5() {
         let parser: Parser<String, StringReader> =
-            (char("a") ~ char("b") ~ char("c") ~ char("d") ~ char("e")) ^^ String.init
+            (char("a") ~ char("b") ~ char("c") ~ char("d") ~ char("e")).stringParser
 
         expectSuccess(parser: parser,
                       input: "abcde",
@@ -225,7 +212,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testCommitOr() {
         let parser: Parser<String, StringReader> =
             ((char("a") ~ commit(char("b")))
-                || (char("a") ~ char("c"))) ^^ String.init
+                || (char("a") ~ char("c"))).stringParser
 
         expectFailure(parser: parser,
                       input: "")
@@ -241,7 +228,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testOrFirstSuccess() {
         let parser: Parser<String, StringReader> =
             (char("a") ^^ String.init)
-                || ((char("a") ~ char("b")) ^^ String.init)
+                || ((char("a") ~ char("b")).stringParser)
 
         expectFailure(parser: parser,
                       input: "")
@@ -259,7 +246,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testOrLonger() {
         let parser: Parser<String, StringReader> =
             (char("a") ^^ String.init)
-                ||| ((char("a") ~ char("b")) ^^ String.init)
+                ||| ((char("a") ~ char("b")).stringParser)
 
         expectFailure(parser: parser,
                       input: "")
@@ -277,7 +264,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     func testCommitOrLonger() {
         let parser: Parser<String, StringReader> =
             (commit(char("a")) ^^ String.init)
-                ||| ((char("a") ~ char("b")) ^^ String.init)
+                ||| ((char("a") ~ char("b")).stringParser)
 
         expectError(parser: parser,
                     input: "")

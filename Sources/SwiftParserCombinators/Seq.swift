@@ -41,6 +41,16 @@ public func ~ <T, Input>(lhs: Parser<T, Input>,
     return lhs.seq(rhs).map { [$0, $1] }
 }
 
+public func ~ <T, Input>(lhs: Parser<[T], Input>,
+                         rhs: @autoclosure @escaping () -> Parser<T, Input>)
+    -> Parser<[T], Input>
+{
+    return lhs.seq(rhs).map {
+        var (xs, x) = $0
+        xs.append(x)
+        return xs
+    }
+}
 
 public func ~ <T, U, Input>(lhs: Parser<T, Input>,
                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
