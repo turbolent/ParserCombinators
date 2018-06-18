@@ -21,7 +21,7 @@ public enum ParseResult<T, Input: Reader> {
     case failure(message: String, remaining: Input)
     case error(message: String, remaining: Input)
 
-    var remaining: Input {
+    public var remaining: Input {
         switch self {
         case .success(_, let remaining):
             return remaining

@@ -131,5 +131,7 @@ public func rep<T, U, Input>(_ parser: @autoclosure @escaping () -> Parser<T, In
         return repeatingParser
     }
 
-    return repeatingParser || success([])
+    let successParser: Parser<[T], Input> = success([])
+
+    return repeatingParser || successParser
 }
