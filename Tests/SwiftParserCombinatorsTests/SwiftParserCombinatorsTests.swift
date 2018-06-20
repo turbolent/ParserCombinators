@@ -10,7 +10,7 @@ extension Parser where T == [Character] {
 class SwiftParserCombinatorsTests: XCTestCase {
 
     func testAccept() {
-        let parser: Parser<Character, StringReader> = char("a")
+        let parser: Parser<Character, CollectionReader<String>> = char("a")
 
         expectSuccess(parser: parser,
                       input: "a",
@@ -24,7 +24,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testLiteral() {
-        let parser: Parser<String, StringReader> = literal("test")
+        let parser: Parser<String, CollectionReader<String>> = literal("test")
 
         expectSuccess(parser: parser,
                       input: "test",
@@ -39,7 +39,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testMap() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             char("a") ^^ { String($0).uppercased() }
 
         expectSuccess(parser: parser,
@@ -49,7 +49,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testMapValue() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             char("a") ^^^ "XXX"
 
         expectSuccess(parser: parser,
@@ -58,7 +58,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeq() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ~ char("b")).stringParser
 
         expectSuccess(parser: parser,
@@ -78,7 +78,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeq3() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ~ char("b") ~ char("c")).stringParser
 
         expectSuccess(parser: parser,
@@ -100,7 +100,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeq4() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ~ char("b") ~ char("c") ~ char("d")).stringParser
 
         expectSuccess(parser: parser,
@@ -124,7 +124,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeq5() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ~ char("b") ~ char("c") ~ char("d") ~ char("e")).stringParser
 
         expectSuccess(parser: parser,
@@ -151,7 +151,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
 
     func testSeqIgnoreLeft() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ~> char("b")) ^^ String.init
 
         expectFailure(parser: parser,
@@ -169,7 +169,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeqIgnoreRight() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") <~ char("b")) ^^ String.init
 
         expectFailure(parser: parser,
@@ -187,7 +187,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testOr() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") || char("b")) ^^ String.init
 
         expectFailure(parser: parser,
@@ -210,7 +210,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testCommitOr() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             ((char("a") ~ commit(char("b")))
                 || (char("a") ~ char("c"))).stringParser
 
@@ -226,7 +226,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testOrFirstSuccess() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ^^ String.init)
                 || ((char("a") ~ char("b")).stringParser)
 
@@ -244,7 +244,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testOrLonger() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("a") ^^ String.init)
                 ||| ((char("a") ~ char("b")).stringParser)
 
@@ -262,7 +262,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testCommitOrLonger() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (commit(char("a")) ^^ String.init)
                 ||| ((char("a") ~ char("b")).stringParser)
 
@@ -282,7 +282,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testOpt() {
-        let parser: Parser<String?, StringReader> =
+        let parser: Parser<String?, CollectionReader<String>> =
             (char("a") ^^ String.init).opt()
 
         expectSuccess(parser: parser,
@@ -302,7 +302,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepNoMinNoMax() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             (char("a") ^^ String.init).rep()
 
         expectSuccess(parser: parser,
@@ -324,7 +324,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepMinNoMax() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             (char("a") ^^ String.init).rep(min: 2)
 
         expectFailure(parser: parser,
@@ -345,7 +345,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepMinMax() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             (char("a") ^^ String.init).rep(min: 2, max: 4)
 
         expectFailure(parser: parser,
@@ -372,7 +372,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepZeroMax() {
-        let parser: Parser<[Character], StringReader> =
+        let parser: Parser<[Character], CollectionReader<String>> =
             char("a").rep(max: 0)
 
         expectSuccess(parser: parser,
@@ -387,7 +387,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepError() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             commit(char("a") ^^ String.init).rep(min: 1)
 
         expectSuccess(parser: parser,
@@ -409,7 +409,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepNoMinNoMax() {
-        let parser: Parser<[Character], StringReader> =
+        let parser: Parser<[Character], CollectionReader<String>> =
             char("a").rep(separator: char(","))
 
         expectSuccess(parser: parser,
@@ -437,7 +437,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepMinNoMax() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             (char("a") ^^ String.init)
                 .rep(separator: char(","),
                      min: 2)
@@ -460,7 +460,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepMinMax() {
-        let parser: Parser<[String], StringReader> =
+        let parser: Parser<[String], CollectionReader<String>> =
             (char("a") ^^ String.init)
                 .rep(separator: char(","),
                      min: 2, max: 4)
@@ -489,7 +489,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepZeroMax() {
-        let parser: Parser<[Character], StringReader> =
+        let parser: Parser<[Character], CollectionReader<String>> =
             char("a").rep(separator: char(","), max: 0)
 
         expectSuccess(parser: parser,
@@ -504,7 +504,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testTuples() {
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             (char("(") ~ char(" ").rep() ~ char(")")) ^^ {
                 let (open, inner, outer) = $0
                 return String([open] + inner + [outer])
@@ -526,11 +526,11 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRecursive() {
-        let simple: Parser<String, StringReader> =
+        let simple: Parser<String, CollectionReader<String>> =
             (char("(") ~ char(")")) ^^^ "()"
-        let parser: Parser<String, StringReader> =
+        let parser: Parser<String, CollectionReader<String>> =
             Parser.recursive { parser in
-                let nested: Parser<String, StringReader> =
+                let nested: Parser<String, CollectionReader<String>> =
                     (char("(") ~ parser ~ char(")")) ^^ {
                         let (_, inner, _) = $0
                         return "(\(inner))"
@@ -563,7 +563,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testNotFollowedBy() {
 
-        let parser: Parser<Bool, StringReader> =
+        let parser: Parser<Bool, CollectionReader<String>> =
             notFollowedBy(char("a")) ^^^ true
 
         expectFailure(parser: parser,
@@ -582,7 +582,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testFollowedBy() {
-        let parser: Parser<Bool, StringReader> =
+        let parser: Parser<Bool, CollectionReader<String>> =
             followedBy(char("a")) ^^^ true
 
         expectSuccess(parser: parser,

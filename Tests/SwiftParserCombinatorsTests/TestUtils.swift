@@ -3,8 +3,8 @@ import XCTest
 import SwiftParserCombinators
 
 
-func expectSuccess<T>(parser: Parser<T, StringReader>, input: String, expected: T) where T: Equatable {
-    let reader = StringReader(string: input)
+func expectSuccess<T>(parser: Parser<T, CollectionReader<String>>, input: String, expected: T) where T: Equatable {
+    let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
     case .success(let value, _):
@@ -14,8 +14,8 @@ func expectSuccess<T>(parser: Parser<T, StringReader>, input: String, expected: 
     }
 }
 
-func expectSuccess<T>(parser: Parser<T?, StringReader>, input: String, expected: T?) where T: Equatable {
-    let reader = StringReader(string: input)
+func expectSuccess<T>(parser: Parser<T?, CollectionReader<String>>, input: String, expected: T?) where T: Equatable {
+    let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
     case .success(let value, _):
@@ -25,8 +25,8 @@ func expectSuccess<T>(parser: Parser<T?, StringReader>, input: String, expected:
     }
 }
 
-func expectSuccess<T>(parser: Parser<[T], StringReader>, input: String, expected: [T]) where T: Equatable {
-    let reader = StringReader(string: input)
+func expectSuccess<T>(parser: Parser<[T], CollectionReader<String>>, input: String, expected: [T]) where T: Equatable {
+    let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
     case .success(let value, _):
@@ -36,8 +36,8 @@ func expectSuccess<T>(parser: Parser<[T], StringReader>, input: String, expected
     }
 }
 
-func expectFailure<T>(parser: Parser<T, StringReader>, input: String) {
-    let reader = StringReader(string: input)
+func expectFailure<T>(parser: Parser<T, CollectionReader<String>>, input: String) {
+    let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
     case .success:
@@ -49,8 +49,8 @@ func expectFailure<T>(parser: Parser<T, StringReader>, input: String) {
     }
 }
 
-func expectError<T>(parser: Parser<T, StringReader>, input: String) {
-    let reader = StringReader(string: input)
+func expectError<T>(parser: Parser<T, CollectionReader<String>>, input: String) {
+    let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
     case .success:

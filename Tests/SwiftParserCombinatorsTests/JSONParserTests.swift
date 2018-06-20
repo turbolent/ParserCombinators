@@ -258,7 +258,7 @@ class JSONParserTests: XCTestCase {
     }
 
     func testJSON() {
-        expectSuccess(parser: JSONParser<StringReader>.json(),
+        expectSuccess(parser: JSONParser<CollectionReader<String>>.json(),
                       input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] ",
                       expected: JSON.array([.null, .bool(true), .bool(false), .string("test"),
                                             .array([.object([]),
