@@ -193,7 +193,7 @@ class JSONParser<Input: Reader> where Input.Element == Character {
     }
 
     static func zero() -> StringParser {
-        return char("0") ^^^ "0"
+        return "0" ^^^ "0"
     }
 
     static func digit() -> CharacterParser {
@@ -212,7 +212,7 @@ class JSONParser<Input: Reader> where Input.Element == Character {
     }
 
     static func fracPart() -> StringParser {
-        return (char(".") ~> rep(digit())) ^^ { String($0) }
+        return ("." ~> rep(digit())) ^^ { String($0) }
     }
 
     static func expPart() -> StringParser {

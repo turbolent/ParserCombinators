@@ -20,7 +20,8 @@ extension Parser {
     }
 }
 
-private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>, remaining: Input, elements: [T],
+private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>,
+                               remaining: Input, elements: [T],
                                n: Int, min: Int = 0, max: Int?)
     -> Trampoline<ParseResult<[T], Input>>
 {
