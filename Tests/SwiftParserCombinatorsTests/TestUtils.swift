@@ -3,7 +3,7 @@ import XCTest
 import SwiftParserCombinators
 
 
-func expectSuccess<T>(parser: Parser<T, CollectionReader<String>>, input: String, expected: T) where T: Equatable {
+func expectSuccess<T>(parser: Parser<T, Character>, input: String, expected: T) where T: Equatable {
     let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
@@ -14,7 +14,7 @@ func expectSuccess<T>(parser: Parser<T, CollectionReader<String>>, input: String
     }
 }
 
-func expectSuccess<T>(parser: Parser<T?, CollectionReader<String>>, input: String, expected: T?) where T: Equatable {
+func expectSuccess<T>(parser: Parser<T?, Character>, input: String, expected: T?) where T: Equatable {
     let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
@@ -25,7 +25,7 @@ func expectSuccess<T>(parser: Parser<T?, CollectionReader<String>>, input: Strin
     }
 }
 
-func expectSuccess<T>(parser: Parser<[T], CollectionReader<String>>, input: String, expected: [T]) where T: Equatable {
+func expectSuccess<T>(parser: Parser<[T], Character>, input: String, expected: [T]) where T: Equatable {
     let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
@@ -36,7 +36,7 @@ func expectSuccess<T>(parser: Parser<[T], CollectionReader<String>>, input: Stri
     }
 }
 
-func expectFailure<T>(parser: Parser<T, CollectionReader<String>>, input: String) {
+func expectFailure<T>(parser: Parser<T, Character>, input: String) {
     let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {
@@ -49,7 +49,7 @@ func expectFailure<T>(parser: Parser<T, CollectionReader<String>>, input: String
     }
 }
 
-func expectError<T>(parser: Parser<T, CollectionReader<String>>, input: String) {
+func expectError<T>(parser: Parser<T, Character>, input: String) {
     let reader = CollectionReader(collection: input)
     let result = parser.parse(reader)
     switch result {

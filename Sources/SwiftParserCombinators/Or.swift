@@ -3,9 +3,9 @@ import Trampoline
 
 extension Parser {
 
-    public func or<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>) -> Parser<Either<T, U>, Input> {
+    public func or<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>) -> Parser<Either<T, U>, Element> {
         let lazyNext = Lazy(next)
-        return Parser<Either<T, U>, Input> { input in
+        return Parser<Either<T, U>, Element> { input in
             self.step(input).flatMap { result in
                 switch result {
                 case .success:
@@ -43,15 +43,15 @@ extension Parser {
         }
     }
 
-    public func or(_ next: @autoclosure @escaping () -> Parser<T, Input>) -> Parser<T, Input> {
+    public func or(_ next: @autoclosure @escaping () -> Parser<T, Element>) -> Parser<T, Element> {
         return or(next).map { $0.value }
     }
 
-    public func orLonger<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
-        -> Parser<Either<T, U>, Input> {
+    public func orLonger<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+        -> Parser<Either<T, U>, Element> {
 
         let lazyNext = Lazy(next)
-        return Parser<Either<T, U>, Input> { input in
+        return Parser<Either<T, U>, Element> { input in
             self.step(input).flatMap { result in
                 switch result {
                 case .success(_, let remaining):
@@ -93,22 +93,22 @@ extension Parser {
         }
     }
 
-    public func orLonger(_ next: @autoclosure @escaping () -> Parser<T, Input>) -> Parser<T, Input> {
+    public func orLonger(_ next: @autoclosure @escaping () -> Parser<T, Element>) -> Parser<T, Element> {
         return orLonger(next).map { $0.value }
     }
 }
 
 
-public func || <T, U, Input>(lhs: Parser<T, Input>,
-                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
-    -> Parser<Either<T, U>, Input>
+public func || <T, U, Element>(lhs: Parser<T, Element>,
+                               rhs: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<Either<T, U>, Element>
 {
     return lhs.or(rhs)
 }
 
-public func || <T, Input>(lhs: Parser<T, Input>,
-                          rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<T, Input>
+public func || <T, Element>(lhs: Parser<T, Element>,
+                            rhs: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<T, Element>
 {
     return lhs.or(rhs)
 }
@@ -116,16 +116,16 @@ public func || <T, Input>(lhs: Parser<T, Input>,
 
 infix operator ||| : LogicalDisjunctionPrecedence
 
-public func ||| <T, U, Input>(lhs: Parser<T, Input>,
-                              rhs: @autoclosure @escaping () -> Parser<U, Input>)
-    -> Parser<Either<T, U>, Input>
+public func ||| <T, U, Element>(lhs: Parser<T, Element>,
+                                rhs: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<Either<T, U>, Element>
 {
     return lhs.orLonger(rhs)
 }
 
-public func ||| <T, Input>(lhs: Parser<T, Input>,
-                           rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<T, Input>
+public func ||| <T, Element>(lhs: Parser<T, Element>,
+                             rhs: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<T, Element>
 {
     return lhs.orLonger(rhs)
 }

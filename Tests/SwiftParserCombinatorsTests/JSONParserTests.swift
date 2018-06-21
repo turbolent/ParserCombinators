@@ -41,12 +41,12 @@ let hexDigits = CharacterSet.decimalDigits
     .union(CharacterSet(charactersIn: "A"..."F"))
 
 
-class JSONParser<Input: Reader> where Input.Element == Character {
-    typealias CharacterParser = Parser<Character, Input>
-    typealias CharactersParser = Parser<[Character], Input>
-    typealias StringParser = Parser<String, Input>
-    typealias VoidParser = Parser<Void, Input>
-    typealias JSONParser = Parser<JSON, Input>
+class JSONParsers {
+    typealias CharacterParser = Parser<Character, Character>
+    typealias CharactersParser = Parser<[Character], Character>
+    typealias StringParser = Parser<String, Character>
+    typealias VoidParser = Parser<Void, Character>
+    typealias JSONParser = Parser<JSON, Character>
 
     static func json() -> JSONParser {
         return withWhitespace(value())
@@ -86,8 +86,8 @@ class JSONParser<Input: Reader> where Input.Element == Character {
         return structure(start: "[", content: content, end: "]")
     }
 
-    static func structure<T>(start: Character, content: Parser<T, Input>, end: Character)
-        -> Parser<T, Input>
+    static func structure<T>(start: Character, content: Parser<T, Character>, end: Character)
+        -> Parser<T, Character>
     {
         return (structureChar(start) ~> content) <~ structureChar(end)
     }
@@ -96,7 +96,7 @@ class JSONParser<Input: Reader> where Input.Element == Character {
         return withWhitespace(char(character)) ^^^ ()
     }
 
-    static func withWhitespace<T>(_ parser: Parser<T, Input>) -> Parser<T, Input> {
+    static func withWhitespace<T>(_ parser: Parser<T, Character>) -> Parser<T, Character> {
         return (whitespace() ~> parser) <~ whitespace()
     }
 
@@ -234,31 +234,31 @@ class JSONParser<Input: Reader> where Input.Element == Character {
 class JSONParserTests: XCTestCase {
 
     func testUnicode() {
-        expectSuccess(parser: JSONParser.unicodeBlock() ^^ { String($0) },
+        expectSuccess(parser: JSONParsers.unicodeBlock() ^^ { String($0) },
                       input: "09Af",
                       expected: "09Af")
     }
 
     func testCharSeqUnicode() {
-        expectSuccess(parser: JSONParser.charSeq(),
+        expectSuccess(parser: JSONParsers.charSeq(),
                       input: "\\u09Af",
                       expected: "য")
     }
 
     func testCharSeqUnicodeMultiple() {
-        expectSuccess(parser: JSONParser.charSeq(),
+        expectSuccess(parser: JSONParsers.charSeq(),
                       input: "\\uD834\\uDD1E",
                       expected: "𝄞")
     }
 
     func testString() {
-        expectSuccess(parser: JSONParser.string(),
+        expectSuccess(parser: JSONParsers.string(),
                       input: "\"This is\\n a \\b test\"",
                       expected: "This is\n a \u{8} test")
     }
 
     func testJSON() {
-        expectSuccess(parser: JSONParser<CollectionReader<String>>.json(),
+        expectSuccess(parser: JSONParsers.json(),
                       input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] ",
                       expected: JSON.array([.null, .bool(true), .bool(false), .string("test"),
                                             .array([.object([]),

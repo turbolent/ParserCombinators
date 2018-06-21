@@ -4,26 +4,26 @@ import Trampoline
 
 extension Parser {
 
-    public func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Input> {
+    public func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Element> {
         return SwiftParserCombinators.rep(self, min: min, max: max)
     }
 
-    public func rep(n: Int) -> Parser<[T], Input> {
+    public func rep(n: Int) -> Parser<[T], Element> {
         return SwiftParserCombinators.rep(self, min: n, max: n)
     }
 
-    public func rep<U>(separator: @autoclosure @escaping () -> Parser<U, Input>,
+    public func rep<U>(separator: @autoclosure @escaping () -> Parser<U, Element>,
                        min: Int = 0, max: Int? = nil)
-        -> Parser<[T], Input>
+        -> Parser<[T], Element>
     {
         return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
     }
 }
 
-private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>,
-                               remaining: Input, elements: [T],
-                               n: Int, min: Int = 0, max: Int?)
-    -> Trampoline<ParseResult<[T], Input>>
+private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
+                                 remaining: Reader<Element>, elements: [T],
+                                 n: Int, min: Int = 0, max: Int?)
+    -> Trampoline<ParseResult<[T], Element>>
 {
     return More {
         if n == max {
@@ -56,9 +56,9 @@ private func repStep<T, Input>(lazyParser: Lazy<Parser<T, Input>>,
 }
 
 
-public func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>,
-                          min: Int = 0, max: Int? = nil)
-    -> Parser<[T], Input>
+public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
+                            min: Int = 0, max: Int? = nil)
+    -> Parser<[T], Element>
 {
     if let max = max {
         guard min <= max else {
@@ -78,18 +78,18 @@ public func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input
     }
 }
 
-public func rep<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>,
-                          n: Int)
-    -> Parser<[T], Input>
+public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
+                            n: Int)
+    -> Parser<[T], Element>
 {
     return rep(parser, min: n, max: n)
 }
 
-public func rep<T, U, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>,
-                             separator: @autoclosure @escaping () -> Parser<U, Input>,
-                             min: Int = 0,
-                             max: Int? = nil)
-    -> Parser<[T], Input>
+public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
+                               separator: @autoclosure @escaping () -> Parser<U, Element>,
+                               min: Int = 0,
+                               max: Int? = nil)
+    -> Parser<[T], Element>
 {
     if let max = max {
         guard min <= max else {
@@ -104,7 +104,7 @@ public func rep<T, U, Input>(_ parser: @autoclosure @escaping () -> Parser<T, In
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let repeatingParser: Parser<[T], Input> = {
+    let repeatingParser: Parser<[T], Element> = {
         if let max = max, max == 1 {
             return lazyParser.value ^^ { [$0] }
         }
@@ -132,7 +132,7 @@ public func rep<T, U, Input>(_ parser: @autoclosure @escaping () -> Parser<T, In
         return repeatingParser
     }
 
-    let successParser: Parser<[T], Input> = success([])
+    let successParser: Parser<[T], Element> = success([])
 
     return repeatingParser || successParser
 }

@@ -2,24 +2,33 @@
 import Foundation
 
 
-public protocol Reader {
-    associatedtype Element
-    associatedtype Offset: Comparable
-    associatedtype Position: SwiftParserCombinators.Position
-    var atEnd: Bool { get }
-    var first: Element { get }
-    var rest: Self { get }
-    var offset: Offset { get }
-    var position: Position { get }
-}
+public class Reader<Element> {
 
-public enum ReaderError: Error {
-    case endOfFile
-}
+    internal init() {}
 
+    internal var atEnd: Bool {
+        fatalError()
+    }
+
+    internal var first: Element {
+        fatalError()
+    }
+
+    internal func rest() -> Self {
+        fatalError()
+    }
+
+    internal var position: Position {
+        fatalError()
+    }
+
+    internal var offset: Int {
+        fatalError()
+    }
+}
 
 extension Reader {
-    public func read(count: Int) throws -> ([Element], Self) {
+    public func read(count: Int) throws -> ([Element], Reader<Element>) {
         var elements: [Element] = []
         var reader = self
         for _ in 0..<count {
@@ -28,10 +37,14 @@ extension Reader {
             }
 
             elements.append(reader.first)
-            reader = reader.rest
+            reader = reader.rest()
         }
         return (elements, reader)
     }
+}
+
+public enum ReaderError: Error {
+    case endOfFile
 }
 
 public protocol Position: CustomStringConvertible  {

@@ -2,9 +2,9 @@
 import Trampoline
 
 
-public func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
-                            errorMessageSupplier: @escaping (Input.Element) -> String)
-    -> Parser<Input.Element, Input>
+public func acceptIf<Element>(predicate: @escaping (Element) -> Bool,
+                              errorMessageSupplier: @escaping (Element) -> String)
+    -> Parser<Element, Element>
 {
     return Parser { input in
         guard !input.atEnd else {
@@ -21,27 +21,25 @@ public func acceptIf<Input>(predicate: @escaping (Input.Element) -> Bool,
         }
 
         return Done(.success(value: element,
-                             remaining: input.rest))
+                             remaining: input.rest()))
     }
 }
 
-public func elem<Input>(kind: String, predicate: @escaping (Input.Element) -> Bool)
-    -> Parser<Input.Element, Input>
-    where Input.Element: Equatable
+public func elem<Element>(kind: String, predicate: @escaping (Element) -> Bool)
+    -> Parser<Element, Element>
+    where Element: Equatable
 {
     return acceptIf(predicate: predicate,
                     errorMessageSupplier: { e in "\(kind) expected" })
 }
 
-public func accept<Input>(_ element: Input.Element) -> Parser<Input.Element, Input>
-    where Input.Element: Equatable
+public func accept<Element>(_ element: Element) -> Parser<Element, Element>
+    where Element: Equatable
 {
     return acceptIf(predicate: { $0 == element },
                     errorMessageSupplier: { e in "expected \(element) but found \(e)" })
 }
 
-public func char<Input>(_ char: Character) -> Parser<Character, Input>
-    where Input.Element == Character
-{
+public func char(_ char: Character) -> Parser<Character, Character> {
     return accept(char)
 }

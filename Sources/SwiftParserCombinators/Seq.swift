@@ -1,8 +1,8 @@
 
 extension Parser {
 
-    public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
-        -> Parser<(T, U), Input>
+    public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+        -> Parser<(T, U), Element>
     {
         let lazyNext = Lazy(next)
         return flatMap { firstResult in
@@ -12,15 +12,15 @@ extension Parser {
         }
     }
 
-    public func seqIgnoreLeft<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
-        -> Parser<U, Input>
+    public func seqIgnoreLeft<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+        -> Parser<U, Element>
     {
         let lazyNext = Lazy(next)
         return flatMap { _ in lazyNext.value }
     }
 
-    public func seqIgnoreRight<U>(_ next: @autoclosure @escaping () -> Parser<U, Input>)
-        -> Parser<T, Input>
+    public func seqIgnoreRight<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+        -> Parser<T, Element>
     {
         let lazyNext = Lazy(next)
         return flatMap { firstResult in

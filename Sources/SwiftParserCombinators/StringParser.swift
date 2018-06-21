@@ -2,9 +2,8 @@
 import Trampoline
 
 
-public final class StringParser<Input: Reader>: Parser<String, Input>, ExpressibleByStringLiteral
-    where Input.Element == Character
-{
+public final class StringParser: Parser<String, Character>, ExpressibleByStringLiteral {
+
     public convenience init(stringLiteral string: String) {
         self.init(string)
     }
@@ -29,45 +28,35 @@ public final class StringParser<Input: Reader>: Parser<String, Input>, Expressib
     }
 }
 
-public func literal<Input>(_ string: String) -> StringParser<Input>
-    where Input.Element == Character
-{
+public func literal(_ string: String) -> StringParser {
     return StringParser(string)
 }
 
-public func opt<Input>(_ string: String) -> Parser<String?, Input>
-    where Input.Element == Character
-{
+public func opt(_ string: String) -> Parser<String?, Character> {
     return StringParser(string).opt()
 }
 
 
 // ||
 
-public func || <Input>(lhs: String, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func || (lhs: String, rhs: String) -> Parser<String, Character> {
     return StringParser(lhs) || StringParser(rhs)
 }
 
-public func || <Input>(lhs: Parser<String, Input>, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func || (lhs: Parser<String, Character>, rhs: String) -> Parser<String, Character> {
     return lhs || StringParser(rhs)
 }
 
-public func || <Input>(lhs: String,
-                       rhs: @autoclosure @escaping () -> Parser<String, Input>)
-    -> Parser<String, Input>
-    where Input.Element == Character
+public func || (lhs: String,
+                rhs: @autoclosure @escaping () -> Parser<String, Character>)
+    -> Parser<String, Character>
 {
     return StringParser(lhs) || rhs
 }
 
-public func || <T, Input>(lhs: String,
-                          rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<Either<String, T>, Input>
-    where Input.Element == Character
+public func || <T>(lhs: String,
+                   rhs: @autoclosure @escaping () -> Parser<T, Character>)
+    -> Parser<Either<String, T>, Character>
 {
     return StringParser(lhs) || rhs
 }
@@ -75,30 +64,24 @@ public func || <T, Input>(lhs: String,
 
 // |||
 
-public func ||| <Input>(lhs: String, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func ||| (lhs: String, rhs: String) -> Parser<String, Character> {
     return StringParser(lhs) ||| StringParser(rhs)
 }
 
-public func ||| <Input>(lhs: Parser<String, Input>, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func ||| (lhs: Parser<String, Character>, rhs: String) -> Parser<String, Character> {
     return lhs ||| StringParser(rhs)
 }
 
-public func ||| <Input>(lhs: String,
-                        rhs: @autoclosure @escaping () -> Parser<String, Input>)
-    -> Parser<String, Input>
-    where Input.Element == Character
+public func ||| (lhs: String,
+                 rhs: @autoclosure @escaping () -> Parser<String, Character>)
+    -> Parser<String, Character>
 {
     return StringParser(lhs) ||| rhs
 }
 
-public func ||| <T, Input>(lhs: String,
-                           rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<Either<String, T>, Input>
-    where Input.Element == Character
+public func ||| <T>(lhs: String,
+                    rhs: @autoclosure @escaping () -> Parser<T, Character>)
+    -> Parser<Either<String, T>, Character>
 {
     return StringParser(lhs) ||| rhs
 }
@@ -106,51 +89,39 @@ public func ||| <T, Input>(lhs: String,
 
 // ~
 
-public func ~ <Input>(lhs: String, rhs: String) -> Parser<[String], Input>
-    where Input.Element == Character {
-
+public func ~ (lhs: String, rhs: String) -> Parser<[String], Character> {
     return StringParser(lhs) ~ StringParser(rhs)
 }
 
-public func ~ <Input>(lhs: Parser<String, Input>, rhs: String) -> Parser<[String], Input>
-    where Input.Element == Character {
-
+public func ~ (lhs: Parser<String, Character>, rhs: String) -> Parser<[String], Character> {
     return lhs ~ StringParser(rhs)
 }
 
-public func ~ <T, Input>(lhs: String,
-                         rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<(String, T), Input>
-    where Input.Element == Character {
-
+public func ~ <T>(lhs: String,
+                  rhs: @autoclosure @escaping () -> Parser<T, Character>)
+    -> Parser<(String, T), Character>
+{
     return StringParser(lhs) ~ rhs
 }
 
-public func ~ <Input>(lhs: Parser<[String], Input>, rhs: String) -> Parser<[String], Input>
-    where Input.Element == Character {
-
+public func ~ (lhs: Parser<[String], Character>, rhs: String) -> Parser<[String], Character> {
     return lhs ~ StringParser(rhs)
 }
 
 
 // ~>
 
-public func ~> <Input>(lhs: String, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func ~> (lhs: String, rhs: String) -> Parser<String, Character> {
     return StringParser(lhs) ~> StringParser(rhs)
 }
 
-public func ~> <Input>(lhs: Parser<String, Input>, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func ~> (lhs: Parser<String, Character>, rhs: String) -> Parser<String, Character> {
     return lhs ~> StringParser(rhs)
 }
 
-public func ~> <T, Input>(lhs: String,
-                          rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<T, Input>
-    where Input.Element == Character
+public func ~> <T>(lhs: String,
+                   rhs: @autoclosure @escaping () -> Parser<T, Character>)
+    -> Parser<T, Character>
 {
     return StringParser(lhs) ~> rhs
 }
@@ -158,22 +129,17 @@ public func ~> <T, Input>(lhs: String,
 
 // <~
 
-public func <~ <Input>(lhs: String, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func <~ (lhs: String, rhs: String) -> Parser<String, Character> {
     return StringParser(lhs) <~ StringParser(rhs)
 }
 
-public func <~ <Input>(lhs: Parser<String, Input>, rhs: String) -> Parser<String, Input>
-    where Input.Element == Character
-{
+public func <~ <T>(lhs: Parser<T, Character>, rhs: String) -> Parser<T, Character> {
     return lhs <~ StringParser(rhs)
 }
 
-public func <~ <T, Input>(lhs: String,
-                          rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<String, Input>
-    where Input.Element == Character
+public func <~ <T>(lhs: String,
+                   rhs: @autoclosure @escaping () -> Parser<T, Character>)
+    -> Parser<String, Character>
 {
     return StringParser(lhs) <~ rhs
 }
@@ -181,21 +147,19 @@ public func <~ <T, Input>(lhs: String,
 
 // ^^
 
-public func ^^ <T, Input>(lhs: String,
-                          rhs: @escaping (String) throws -> T)
-    -> Parser<T, Input>
-    where Input.Element == Character {
-
+public func ^^ <T>(lhs: String,
+                   rhs: @escaping (String) throws -> T)
+    -> Parser<T, Character>
+{
     return StringParser(lhs).map(rhs)
 }
 
 
 // ^^^
 
-public func ^^^ <T, Input>(lhs: String,
-                           rhs: @autoclosure @escaping () -> T)
-    -> Parser<T, Input>
-    where Input.Element == Character {
-
+public func ^^^ <T>(lhs: String,
+                    rhs: @autoclosure @escaping () -> T)
+    -> Parser<T, Character>
+{
     return StringParser(lhs).map(rhs)
 }

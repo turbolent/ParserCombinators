@@ -1,9 +1,9 @@
 
-public struct CollectionReader<C: Collection>: Reader {
+public class CollectionReader<C: Collection>: Reader<C.Element> {
     private let collection: C
     private let index: C.Index
 
-    public init(collection: C) {
+    public convenience init(collection: C) {
         self.init(collection: collection,
                   index: collection.startIndex)
     }
@@ -13,30 +13,32 @@ public struct CollectionReader<C: Collection>: Reader {
     {
         self.collection = collection
         self.index = index
+        super.init()
     }
 
-    public var atEnd: Bool {
+    public override var atEnd: Bool {
         return index >= collection.endIndex
     }
 
-    public var first: C.Element {
+    public override var first: C.Element {
         return collection[index]
     }
 
-    public var rest: CollectionReader<C> {
+    public override func rest() -> CollectionReader<C> {
         return CollectionReader(collection: collection,
                                 index: collection.index(after: index))
     }
 
-    public var offset: C.Index {
-        return index
-    }
-
-    public var position: CollectionPosition<C> {
+    public override var position: Position {
         return CollectionPosition(collection: collection,
                                   index: index)
     }
+
+    public override var offset: Int {
+        return collection.distance(from: collection.startIndex, to: index)
+    }
 }
+
 
 public struct CollectionPosition<C: Collection>: Position {
     public let collection: C

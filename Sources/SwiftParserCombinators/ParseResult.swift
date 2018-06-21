@@ -16,12 +16,14 @@ public enum MapError: Error {
  All results provide the remaining input to be parsed.
 */
 
-public enum ParseResult<T, Input: Reader> {
-    case success(value: T, remaining: Input)
-    case failure(message: String, remaining: Input)
-    case error(message: String, remaining: Input)
+public enum ParseResult<T, Element> {
+    public typealias Remaining = Reader<Element>
 
-    public var remaining: Input {
+    case success(value: T, remaining: Remaining)
+    case failure(message: String, remaining: Remaining)
+    case error(message: String, remaining: Remaining)
+
+    public var remaining: Remaining {
         switch self {
         case .success(_, let remaining):
             return remaining
@@ -32,7 +34,7 @@ public enum ParseResult<T, Input: Reader> {
         }
     }
 
-    public func map<U>(_ f: (T) throws -> U) -> ParseResult<U, Input> {
+    public func map<U>(_ f: (T) throws -> U) -> ParseResult<U, Element> {
         switch self {
         case let .success(value, remaining):
             do {
@@ -55,7 +57,7 @@ public enum ParseResult<T, Input: Reader> {
         }
     }
 
-    public func flatMapWithNext<U>(_ f: (T) -> Parser<U, Input>) -> Trampoline<ParseResult<U, Input>> {
+    public func flatMapWithNext<U>(_ f: (T) -> Parser<U, Element>) -> Trampoline<ParseResult<U, Element>> {
         switch self {
         case let .success(value, remaining):
             return f(value).step(remaining)
