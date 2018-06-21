@@ -52,6 +52,17 @@ public func ~ <T, Element>(lhs: Parser<[T], Element>,
     }
 }
 
+public func ~ <T, Element>(lhs: Parser<T, Element>,
+                           rhs: @autoclosure @escaping () -> Parser<[T], Element>)
+    -> Parser<[T], Element>
+{
+    return lhs.seq(rhs).map {
+        var (x, xs) = $0
+        xs.insert(x, at: 0)
+        return xs
+    }
+}
+
 public func ~ <T, U, Element>(lhs: Parser<T, Element>,
                               rhs: @autoclosure @escaping () -> Parser<U, Element>)
     -> Parser<(T, U), Element>

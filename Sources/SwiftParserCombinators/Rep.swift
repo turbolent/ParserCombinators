@@ -121,11 +121,7 @@ public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, 
                        min: min - 1,
                        max: repeatingMax)
 
-        return lazyParser.value ~ more ^^ {
-            var (first, remaining) = $0
-            remaining.insert(first, at: 0)
-            return remaining
-        }
+        return lazyParser.value ~ more
     }()
 
     if min > 0 {

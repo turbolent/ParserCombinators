@@ -504,10 +504,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     func testTuples() {
         let parser =
-            (char("(") ~ char(" ").rep() ~ char(")")) ^^ { (values) -> String in
-                let (open, inner, outer) = values
-                return String([open] + inner + [outer])
-            }
+            (char("(") ~ char(" ").rep() ~ char(")")).stringParser
 
         expectFailure(parser: parser,
                       input: "")

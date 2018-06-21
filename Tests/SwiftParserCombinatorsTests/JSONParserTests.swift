@@ -206,8 +206,7 @@ class JSONParsers {
 
     static func intList() -> StringParser {
         return nonZero() ~ rep(digit()) ^^ {
-            let (nonZero, digits) = $0
-            return String(nonZero) + String(digits)
+            return String($0)
         }
     }
 

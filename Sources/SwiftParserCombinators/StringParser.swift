@@ -93,7 +93,15 @@ public func ~ (lhs: String, rhs: String) -> Parser<[String], Character> {
     return StringParser(lhs) ~ StringParser(rhs)
 }
 
+public func ~ <T>(lhs: Parser<T, Character>, rhs: String) -> Parser<(T, String), Character> {
+    return lhs ~ StringParser(rhs)
+}
+
 public func ~ (lhs: Parser<String, Character>, rhs: String) -> Parser<[String], Character> {
+    return lhs ~ StringParser(rhs)
+}
+
+public func ~ (lhs: Parser<[String], Character>, rhs: String) -> Parser<[String], Character> {
     return lhs ~ StringParser(rhs)
 }
 
@@ -104,9 +112,10 @@ public func ~ <T>(lhs: String,
     return StringParser(lhs) ~ rhs
 }
 
-public func ~ (lhs: Parser<[String], Character>, rhs: String) -> Parser<[String], Character> {
-    return lhs ~ StringParser(rhs)
+public func ~ (lhs: String, rhs: Parser<[String], Character>) -> Parser<[String], Character> {
+    return StringParser(lhs) ~ rhs
 }
+
 
 
 // ~>
