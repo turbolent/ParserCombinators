@@ -112,7 +112,17 @@ public func ~ <T>(lhs: String,
     return StringParser(lhs) ~ rhs
 }
 
-public func ~ (lhs: String, rhs: Parser<[String], Character>) -> Parser<[String], Character> {
+public func ~ (lhs: String,
+               rhs: @autoclosure @escaping () -> Parser<String, Character>)
+    -> Parser<[String], Character>
+{
+    return StringParser(lhs) ~ rhs
+}
+
+public func ~ (lhs: String,
+               rhs: @autoclosure @escaping () -> Parser<[String], Character>)
+    -> Parser<[String], Character>
+{
     return StringParser(lhs) ~ rhs
 }
 
