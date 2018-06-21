@@ -2,7 +2,7 @@ language: generic
 env:
   global:
     - SWIFT_BRANCH=swift-4.2-branch
-    - SWIFT_VERSION=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-05-a
+    - SWIFT_VERSION=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-03-a
 matrix:
   include:
     - script: swift package update && swift test
