@@ -2,12 +2,12 @@ language: generic
 env:
   global:
     - SWIFT_BRANCH=swift-4.2-branch
-    - SWIFT_VERSION=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-17-a
+    - SWIFT_VERSION=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-05-a
 matrix:
   include:
     - script: swift package update && swift test
       os: osx
-      osx_image: xcode9.3
+      osx_image: xcode9.4
       sudo: required
       install:
         - wget https://swift.org/builds/$SWIFT_BRANCH/xcode/$SWIFT_VERSION/$SWIFT_VERSION-osx.pkg
