@@ -34,16 +34,16 @@ extension Parser {
 
 infix operator ~: ApplicativePrecedence
 
-public func ~ <T, Input>(lhs: Parser<T, Input>,
-                         rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<[T], Input>
+public func ~ <T, Element>(lhs: Parser<T, Element>,
+                           rhs: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<[T], Element>
 {
     return lhs.seq(rhs).map { [$0, $1] }
 }
 
-public func ~ <T, Input>(lhs: Parser<[T], Input>,
-                         rhs: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<[T], Input>
+public func ~ <T, Element>(lhs: Parser<[T], Element>,
+                           rhs: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<[T], Element>
 {
     return lhs.seq(rhs).map {
         var (xs, x) = $0
@@ -52,44 +52,44 @@ public func ~ <T, Input>(lhs: Parser<[T], Input>,
     }
 }
 
-public func ~ <T, U, Input>(lhs: Parser<T, Input>,
-                            rhs: @autoclosure @escaping () -> Parser<U, Input>)
-    -> Parser<(T, U), Input>
+public func ~ <T, U, Element>(lhs: Parser<T, Element>,
+                              rhs: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<(T, U), Element>
 {
     return lhs.seq(rhs)
 }
 
-public func ~ <T, U, V, Input>(lhs: Parser<(T, U), Input>,
-                               rhs: @autoclosure @escaping () -> Parser<V, Input>)
-    -> Parser<(T, U, V), Input>
+public func ~ <T, U, V, Element>(lhs: Parser<(T, U), Element>,
+                                 rhs: @autoclosure @escaping () -> Parser<V, Element>)
+    -> Parser<(T, U, V), Element>
 {
     return lhs.seq(rhs).map { ($0.0.0, $0.0.1, $0.1) }
 }
 
-public func ~ <T, U, V, W, Input>(lhs: Parser<(T, U, V), Input>,
-                                  rhs: @autoclosure @escaping () -> Parser<W, Input>)
-    -> Parser<(T, U, V, W), Input>
+public func ~ <T, U, V, W, Element>(lhs: Parser<(T, U, V), Element>,
+                                    rhs: @autoclosure @escaping () -> Parser<W, Element>)
+    -> Parser<(T, U, V, W), Element>
 {
     return lhs.seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
 }
 
-public func ~ <T, U, V, W, X, Input>(lhs: Parser<(T, U, V, W), Input>,
-                                     rhs: @autoclosure @escaping () -> Parser<X, Input>)
-    -> Parser<(T, U, V, W, X), Input>
+public func ~ <T, U, V, W, X, Element>(lhs: Parser<(T, U, V, W), Element>,
+                                       rhs: @autoclosure @escaping () -> Parser<X, Element>)
+    -> Parser<(T, U, V, W, X), Element>
 {
     return lhs.seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
 }
 
-public func ~ <T, U, V, W, X, Y, Input>(lhs: Parser<(T, U, V, W, X), Input>,
-                                        rhs: @autoclosure @escaping () -> Parser<Y, Input>)
-    -> Parser<(T, U, V, W, X, Y), Input>
+public func ~ <T, U, V, W, X, Y, Element>(lhs: Parser<(T, U, V, W, X), Element>,
+                                          rhs: @autoclosure @escaping () -> Parser<Y, Element>)
+    -> Parser<(T, U, V, W, X, Y), Element>
 {
     return lhs.seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1) }
 }
 
-public func ~ <T, U, V, W, X, Y, Z, Input>(lhs: Parser<(T, U, V, W, X, Y), Input>,
-                                        rhs: @autoclosure @escaping () -> Parser<Z, Input>)
-    -> Parser<(T, U, V, W, X, Y, Z), Input>
+public func ~ <T, U, V, W, X, Y, Z, Element>(lhs: Parser<(T, U, V, W, X, Y), Element>,
+                                             rhs: @autoclosure @escaping () -> Parser<Z, Element>)
+    -> Parser<(T, U, V, W, X, Y, Z), Element>
 {
     return lhs.seq(rhs).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1) }
 }
@@ -98,18 +98,18 @@ public func ~ <T, U, V, W, X, Y, Z, Input>(lhs: Parser<(T, U, V, W, X, Y), Input
 // see https://github.com/apple/swift/blob/48308411393e730cf3cb21d353a9be31045c47e4/stdlib/public/core/Policy.swift#L705
 //infix operator ~> : ApplicativeSequencePrecedence
 
-public func ~> <T, U, Input>(lhs: Parser<T, Input>,
-                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
-    -> Parser<U, Input>
+public func ~> <T, U, Element>(lhs: Parser<T, Element>,
+                               rhs: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<U, Element>
 {
     return lhs.seqIgnoreLeft(rhs)
 }
 
 infix operator <~ : ApplicativeSequencePrecedence
 
-public func <~ <T, U, Input>(lhs: Parser<T, Input>,
-                             rhs: @autoclosure @escaping () -> Parser<U, Input>)
-    -> Parser<T, Input>
+public func <~ <T, U, Element>(lhs: Parser<T, Element>,
+                               rhs: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<T, Element>
 {
     return lhs.seqIgnoreRight(rhs)
 }

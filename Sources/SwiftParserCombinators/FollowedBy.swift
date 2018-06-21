@@ -1,7 +1,7 @@
 
 // NOTE: never consumes any input (positive lookahead)
-public func followedBy<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<T, Input>
+public func followedBy<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<T, Element>
 {
     let lazyParser = Lazy(parser)
     return Parser { input in

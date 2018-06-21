@@ -90,19 +90,19 @@ extension ParseResult: CustomStringConvertible {
 }
 
 
-public func success<T, Input>(_ value: T) -> Parser<T, Input> {
+public func success<T, Element>(_ value: T) -> Parser<T, Element> {
     return Parser { input in
         Done(.success(value: value, remaining: input))
     }
 }
 
-public func failure<T, Input>(_ message: String) -> Parser<T, Input> {
+public func failure<T, Element>(_ message: String) -> Parser<T, Element> {
     return Parser { input in
         Done(.failure(message: message, remaining: input))
     }
 }
 
-public func error<T, Input>(_ message: String) -> Parser<T, Input> {
+public func error<T, Element>(_ message: String) -> Parser<T, Element> {
     return Parser { input in
         Done(.error(message: message, remaining: input))
     }

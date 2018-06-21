@@ -1,7 +1,7 @@
 
 // NOTE: never consumes any input (negative lookahead)
-public func notFollowedBy<T, Input>(_ parser: @autoclosure @escaping () -> Parser<T, Input>)
-    -> Parser<Void, Input>
+public func notFollowedBy<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<Void, Element>
 {
     let lazyParser = Lazy(parser)
     return Parser { input in
