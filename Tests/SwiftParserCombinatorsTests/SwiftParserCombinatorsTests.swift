@@ -557,6 +557,20 @@ class SwiftParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser, input: long, expected: long)
     }
 
+    func testRecursive2() {
+        let parser: Parser<String, Character> =
+            Parser.recursive { parser -> Parser<String, Character> in
+                ("1" ~ parser) ^^^ "" || "1"
+            }
+
+        let longCount = 200
+        let long = String(repeating: "1", count: longCount)
+
+        expectSuccess(parser: parser,
+                      input: long,
+                      expected: "")
+    }
+
     func testNotFollowedBy() {
 
         let parser =
@@ -595,6 +609,35 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "ba")
     }
 
+    func testLeftRecursion() {
+
+        var exp: PackratParser<Int, Character>!
+        var number: PackratParser<Int, Character>!
+        var sum: PackratParser<Int, Character>!
+
+        exp = PackratParser(parser:
+            sum || number || ("(" ~> exp) <~ ")"
+        )
+
+        number = PackratParser(parser:
+            elem(kind: "digit", predicate: { "0"..."9" ~= $0 }).rep(min: 1) ^^ {
+                guard let number = Int(String($0)) else {
+                    throw MapError.failure("Invalid number: \($0)")
+                }
+                return number
+            }
+        )
+
+        sum = PackratParser(parser:
+            (exp ~ ("+" ~> exp)) ^^ { $0.reduce(0, +) }
+        )
+
+        expectError(parser: exp,
+                    input: "((42+(23+1)))",
+                    message: "left-recursion",
+                    usePackratReader: true)
+    }
+
     static var allTests = [
         ("testAccept", testAccept),
         ("testLiteral", testLiteral),
@@ -623,7 +666,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRepSepZeroMax", testRepSepZeroMax),
         ("testTuples", testTuples),
         ("testRecursive", testRecursive),
+        ("testRecursive2", testRecursive2),
         ("testNotFollowedBy", testNotFollowedBy),
-        ("testFollowedBy", testFollowedBy)
+        ("testFollowedBy", testFollowedBy),
+        ("testLeftRecursion", testLeftRecursion)
     ]
 }
