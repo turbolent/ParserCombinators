@@ -182,3 +182,11 @@ public func ^^^ <T>(lhs: String,
 {
     return StringParser(lhs).map(rhs)
 }
+
+public func withWhitespace<T>(_ parser: Parser<T, Character>) -> Parser<T, Character> {
+    return (whitespace() ~> parser) <~ whitespace()
+}
+
+public func whitespace() -> Parser<Void, Character> {
+    return rep(`in`([" ", "\t", "\r", "\n"], kind: "whitespace")) ^^^ ()
+}

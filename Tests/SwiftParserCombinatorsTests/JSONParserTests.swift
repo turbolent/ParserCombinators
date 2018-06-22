@@ -96,14 +96,6 @@ class JSONParsers {
         return withWhitespace(char(character)) ^^^ ()
     }
 
-    static func withWhitespace<T>(_ parser: Parser<T, Character>) -> Parser<T, Character> {
-        return (whitespace() ~> parser) <~ whitespace()
-    }
-
-    static func whitespace() -> VoidParser {
-        return rep(`in`([" ", "\t", "\r", "\n"], kind: "whitespace")) ^^^ ()
-    }
-
     static func `in`(_ characters: CharacterSet, kind: String = "") -> CharacterParser {
         return elem(kind: kind) { !$0.unicodeScalars.contains { !characters.contains($0) } }
     }

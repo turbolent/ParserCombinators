@@ -57,9 +57,10 @@ public func ~ <T, Element>(lhs: Parser<T, Element>,
     -> Parser<[T], Element>
 {
     return lhs.seq(rhs).map {
-        var (x, xs) = $0
-        xs.insert(x, at: 0)
-        return xs
+        let (x, xs) = $0
+        var result = [x]
+        result.append(contentsOf: xs)
+        return result
     }
 }
 

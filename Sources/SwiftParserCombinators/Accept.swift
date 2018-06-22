@@ -1,5 +1,6 @@
 
 import Trampoline
+import Foundation
 
 
 public func acceptIf<Element>(predicate: @escaping (Element) -> Bool,
@@ -42,4 +43,12 @@ public func accept<Element>(_ element: Element) -> Parser<Element, Element>
 
 public func char(_ char: Character) -> Parser<Character, Character> {
     return accept(char)
+}
+
+public func `in`(_ characters: CharacterSet, kind: String = "") -> Parser<Character, Character> {
+    return elem(kind: kind) {
+        !$0.unicodeScalars.contains {
+            !characters.contains($0)
+        }
+    }
 }
