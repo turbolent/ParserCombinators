@@ -1,7 +1,6 @@
 
 import Trampoline
 
-
 public class Parser<T, Element> {
     public typealias Input = Reader<Element>
     public typealias Result = ParseResult<T, Element>

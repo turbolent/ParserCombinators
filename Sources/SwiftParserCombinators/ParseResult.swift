@@ -7,15 +7,13 @@ public enum MapError: Error {
 }
 
 
-/**
- A parse result can be either successful (`success`) or not.
- Non-successful results can be either failures (`failure`) or errors (`error`).
- Failures are non-fatal, errors are fatal.
- Successful results provide a result `value` of type `T`.
- Non-successful results provide a message explaining why the parse did not succeed.
- All results provide the remaining input to be parsed.
-*/
-
+/// A parse result can be either successful (`success`) or not.
+/// Non-successful results can be either failures (`failure`) or errors (`error`).
+/// Failures are non-fatal, errors are fatal.
+/// Successful results provide a result `value` of type `T`.
+/// Non-successful results provide a message explaining why the parse did not succeed.
+/// All results provide the remaining input to be parsed.
+///
 public enum ParseResult<T, Element> {
     public typealias Remaining = Reader<Element>
 
@@ -34,7 +32,9 @@ public enum ParseResult<T, Element> {
         }
     }
 
-    public func map<U>(_ f: (T) throws -> U) -> ParseResult<U, Element> {
+    public func map<U>(_ f: (T) throws -> U)
+        -> ParseResult<U, Element>
+    {
         switch self {
         case let .success(value, remaining):
             do {
@@ -57,7 +57,9 @@ public enum ParseResult<T, Element> {
         }
     }
 
-    public func flatMapWithNext<U>(_ f: (T) -> Parser<U, Element>) -> Trampoline<ParseResult<U, Element>> {
+    public func flatMapWithNext<U>(_ f: (T) -> Parser<U, Element>)
+        -> Trampoline<ParseResult<U, Element>>
+    {
         switch self {
         case let .success(value, remaining):
             return f(value).step(remaining)

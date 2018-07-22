@@ -4,14 +4,43 @@ import Trampoline
 
 extension Parser {
 
+    /// Creates a new parser that repeatedly applies this parser until it fails,
+    /// and returns all parsed values.
+    ///
+    /// - Parameters:
+    ///   - min: The minumum number of times this parser needs to succeed.
+    ///          If the parser succeeds fewer times, the new parser returns
+    ///          a non-fatal failure, i.e. not an error, and so backtracking
+    ///          is allowed.
+    ///   - max: The maximum number of times this parser is to be applied.
+    ///
     public func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Element> {
         return SwiftParserCombinators.rep(self, min: min, max: max)
     }
 
+    /// Creates a new parser that repeatedly applies this parser the given number of times,
+    /// and returns all parsed values.
+    ///
+    /// - Parameter n: The number of times this parser is applied and needs to succeed.
+    ///                If the parser succeeds fewer times, the new parser returns
+    ///                a non-fatal failure, i.e. not an error, and so backtracking
+    ///                is allowed.
+    ///
     public func rep(n: Int) -> Parser<[T], Element> {
         return SwiftParserCombinators.rep(self, min: n, max: n)
     }
 
+    /// Creates a new parser that repeatedly applies this parser interleaved with
+    /// the separating parser, until it fails, and returns all parsed values.
+    ///
+    /// - Parameters:
+    ///   - separator: The parser that separates the occurrences of this parser.
+    ///   - min: The minumum number of times this parser needs to succeed.
+    ///          If the parser succeeds fewer times, the new parser returns
+    ///          a non-fatal failure, i.e. not an error, and so backtracking
+    ///          is allowed.
+    ///   - max: The maximum number of times this parser is to be applied.
+    ///
     public func rep<U>(separator: @autoclosure @escaping () -> Parser<U, Element>,
                        min: Int = 0, max: Int? = nil)
         -> Parser<[T], Element>
@@ -57,7 +86,16 @@ private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
     }
 }
 
-
+/// Creates a new parser that repeatedly applies the given parser until it fails,
+/// and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - min: The minumum number of times the given parser needs to succeed.
+///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///          i.e. not an error, and so backtracking is allowed.
+///   - max: The maximum number of times the given parser is to be applied.
+///
 public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
                             min: Int = 0, max: Int? = nil)
     -> Parser<[T], Element>
@@ -80,6 +118,15 @@ public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Ele
     }
 }
 
+/// Creates a new parser that repeatedly applies the given parser the given number of times,
+/// and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - n: The number of times the given parser is applied and needs to succeed.
+///        If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///        i.e. not an error, and so backtracking is allowed.
+///
 public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
                             n: Int)
     -> Parser<[T], Element>
@@ -87,6 +134,17 @@ public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Ele
     return rep(parser, min: n, max: n)
 }
 
+/// Creates a new parser that repeatedly applies the given parser interleaved with
+/// the separating parser, until it fails, and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - separator: The parser that separates the occurrences of the given parser.
+///   - min: The minumum number of times the given parser needs to succeed.
+///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///          i.e. not an error, and so backtracking is allowed.
+///   - max: The maximum number of times the given parser is to be applied.
+///
 public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
                                separator: @autoclosure @escaping () -> Parser<U, Element>,
                                min: Int = 0,

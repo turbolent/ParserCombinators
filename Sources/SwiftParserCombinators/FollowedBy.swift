@@ -1,5 +1,12 @@
 
-// NOTE: never consumes any input (positive lookahead)
+/// Creates a new parser from the given parser, that succeeds if the given parser succeeds,
+/// but does not consume any input. Otherwise it returns a non‐fatal failure, i.e., not an error.
+///
+/// This backtracking combinator allows positive lookahead, i.e., tentatively parsing input
+/// and then backtracking if the parse failed.
+///
+/// - Parameter parser: The parser to be applied.
+///
 public func followedBy<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>)
     -> Parser<T, Element>
 {
