@@ -21,7 +21,8 @@ extension Parser {
 }
 
 private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
-                                 remaining: Reader<Element>, elements: [T],
+                                 remaining: Reader<Element>,
+                                 elements: [T],
                                  n: Int, min: Int = 0, max: Int?)
     -> Trampoline<ParseResult<[T], Element>>
 {
@@ -44,6 +45,7 @@ private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
                     return Done(.failure(message: message2, remaining: remaining2))
                 }
                 return Done(.success(value: elements, remaining: remaining))
+
             case let .error(message2, remaining2):
                 guard n >= min else {
                     // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `result` here.

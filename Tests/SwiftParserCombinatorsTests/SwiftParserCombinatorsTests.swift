@@ -609,6 +609,41 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "ba")
     }
 
+    func testChainLeft() {
+
+        typealias Op = (Int, Int) -> Int
+        typealias OpParser = Parser<Op, Character>
+
+        let addOp: OpParser =
+            char("+") ^^^ (+) ||
+            char("-") ^^^ (-)
+
+        let mulOp: OpParser =
+            char("*") ^^^ (*) ||
+            char("/") ^^^ (/)
+
+        let digit = `in`(.decimalDigits, kind: "digit")
+        let num = digit.rep(min: 1) ^^ { Int(String($0))! }
+
+        let expr: Parser<Int, Character> =
+            Parser.recursive { expr in
+                let value = num
+                    || (char("(") ~> expr) <~ char(")")
+                let prod = value.chainLeft(mulOp, empty: 0)
+                return prod.chainLeft(addOp, empty: 0)
+        }
+
+        expectSuccess(parser: expr,
+                      input: "",
+                      expected: 0)
+        expectSuccess(parser: expr,
+                      input: "(23+42)*3",
+                      expected: 195)
+        expectSuccess(parser: expr,
+                      input: "23+42*3",
+                      expected: 149)
+    }
+
     func testLeftRecursion() {
 
         var exp: PackratParser<Int, Character>!
@@ -669,6 +704,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testRecursive2", testRecursive2),
         ("testNotFollowedBy", testNotFollowedBy),
         ("testFollowedBy", testFollowedBy),
+        ("testChainLeft", testChainLeft),
         ("testLeftRecursion", testLeftRecursion)
     ]
 }
