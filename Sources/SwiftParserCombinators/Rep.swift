@@ -177,11 +177,11 @@ public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, 
             return nil
         }()
 
-        let more = rep(lazySeparator.value ~> lazyParser.value,
+        let more = rep(lazySeparator.value.seqIgnoreLeft(lazyParser.value),
                        min: min - 1,
                        max: repeatingMax)
 
-        return lazyParser.value ~ more
+        return lazyParser.value.seq(more)
     }()
 
     if min > 0 {

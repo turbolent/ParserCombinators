@@ -11,11 +11,11 @@ public class Parser<T, Element> {
         self.stepFunction = stepFunction
     }
 
-    public func step<Input>(_ input: Input) -> Trampoline<Result> where Input: Reader<Element> {
+    public func step(_ input: Input) -> Trampoline<Result> {
         return stepFunction(input)
     }
 
-    public func parse<Input>(_ input: Input) -> Result where Input: Reader<Element> {
+    public func parse(_ input: Input) -> Result {
         return step(input).run()
     }
 }
