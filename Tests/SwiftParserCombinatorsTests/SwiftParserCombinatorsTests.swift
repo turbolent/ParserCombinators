@@ -697,16 +697,15 @@ class SwiftParserCombinatorsTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(String(describing: captures),
-                       String(describing:
-                         Captures(
-                            values: [42, 23, true, "d", "e"],
-                            entries: [
-                                "4": [[42, 23, true, "d", "e"]],
-                                "3": [["e"]],
-                                "1": [[42], [true]],
-                                "2": [[23, true, "d"]]
-                            ])))
+        XCTAssertEqual(String(describing: captures.values),
+                       String(describing: [42, 23, true, "d", "e"]))
+        XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
+                       String(describing: [
+                         (key: "1", value: [[42], [true]]),
+                         (key: "2", value: [[23, true, "d"]]),
+                         (key: "3", value: [["e"]]),
+                         (key: "4", value: [[42, 23, true, "d", "e"]])
+                       ]))
 
     }
 
@@ -742,6 +741,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testNotFollowedBy", testNotFollowedBy),
         ("testFollowedBy", testFollowedBy),
         ("testChainLeft", testChainLeft),
-        ("testLeftRecursion", testLeftRecursion)
+        ("testLeftRecursion", testLeftRecursion),
+        ("testCapturing", testCapturing)
     ]
 }
