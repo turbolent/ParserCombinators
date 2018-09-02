@@ -33,3 +33,14 @@ extension Array: Sequenceable {
         return result
     }
 }
+
+public protocol AnySequenceable {
+    associatedtype SelfSequenced
+    associatedtype PreviousAnySequenced
+    associatedtype NextAnySequenced
+
+    func sequence(other: Self) -> SelfSequenced
+    func sequence(previous: Any) -> PreviousAnySequenced
+    func sequence(next: Any) -> NextAnySequenced
+
+}

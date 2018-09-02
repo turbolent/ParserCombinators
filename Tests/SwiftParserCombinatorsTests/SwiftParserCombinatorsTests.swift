@@ -673,6 +673,43 @@ class SwiftParserCombinatorsTests: XCTestCase {
                     usePackratReader: true)
     }
 
+    func testCapturing() {
+
+        let anySeqCapture: Parser<Captures, Character> =
+            (char("b") ^^^ 23) ~ (char("c") ^^^ true).capture("1")
+
+        let captureSeqAnyCapture: Parser<Captures, Character> =
+            (anySeqCapture ~ char("d")).capture("2")
+
+        let repeatedCapture: Parser<Captures, Character> =
+            (char("a") ^^^ 42).capture("1")
+
+        let simpleCapture =
+            char("e").capture("3")
+
+        let p: Parser<Captures, Character> =
+            (repeatedCapture ~ captureSeqAnyCapture ~ simpleCapture).capture("4")
+
+        guard case .success(let captures, _) =
+            p.parse(CollectionReader(collection: "abcde"))
+        else {
+            XCTFail("should have parsed")
+            return
+        }
+
+        XCTAssertEqual(String(describing: captures),
+                       String(describing:
+                         Captures(
+                            values: [42, 23, true, "d", "e"],
+                            entries: [
+                                "4": [[42, 23, true, "d", "e"]],
+                                "3": [["e"]],
+                                "1": [[42], [true]],
+                                "2": [[23, true, "d"]]
+                            ])))
+
+    }
+
     static var allTests = [
         ("testAccept", testAccept),
         ("testLiteral", testLiteral),
