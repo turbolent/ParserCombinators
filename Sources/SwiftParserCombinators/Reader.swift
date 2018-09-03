@@ -6,23 +6,23 @@ public class Reader<Element> {
 
     internal init() {}
 
-    internal var atEnd: Bool {
+    public var atEnd: Bool {
         fatalError()
     }
 
-    internal var first: Element {
+    public var first: Element {
         fatalError()
     }
 
-    internal func rest() -> Self {
+    public func rest() -> Self {
         fatalError()
     }
 
-    internal var position: Position {
+    public var position: Position {
         fatalError()
     }
 
-    internal var offset: Int {
+    public var offset: Int {
         fatalError()
     }
 }

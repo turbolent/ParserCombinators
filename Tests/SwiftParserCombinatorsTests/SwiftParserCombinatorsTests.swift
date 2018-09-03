@@ -709,6 +709,31 @@ class SwiftParserCombinatorsTests: XCTestCase {
 
     }
 
+    func testSkipUntil() {
+        let p = skipUntil(char("y") ~ char("z"))
+
+        expectSuccess(parser: p,
+                      input: "yz",
+                      expected: ["y", "z"])
+
+        expectSuccess(parser: p,
+                      input: "yzA",
+                      expected: ["y", "z"])
+
+        expectSuccess(parser: p,
+                      input: String(repeating: "x", count: 10) + "yz",
+                      expected: ["y", "z"])
+
+        expectFailure(parser: p,
+                      input: String(repeating: "x", count: 10) + "y")
+
+        expectFailure(parser: p,
+                      input: "y")
+
+        expectFailure(parser: p,
+                      input: "")
+    }
+
     static var allTests = [
         ("testAccept", testAccept),
         ("testLiteral", testLiteral),
