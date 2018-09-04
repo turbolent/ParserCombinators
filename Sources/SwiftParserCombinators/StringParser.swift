@@ -1,5 +1,6 @@
 
 import Trampoline
+import Foundation
 
 
 public final class StringParser: Parser<String, Character>, ExpressibleByStringLiteral {
@@ -184,9 +185,8 @@ public func ^^^ <T>(lhs: String,
 }
 
 public func withWhitespace<T>(_ parser: Parser<T, Character>) -> Parser<T, Character> {
-    return (whitespace() ~> parser) <~ whitespace()
+    return (whitespace ~> parser) <~ whitespace
 }
 
-public func whitespace() -> Parser<Void, Character> {
-    return rep(`in`([" ", "\t", "\r", "\n"], kind: "whitespace")) ^^^ ()
-}
+public let whitespace: Parser<Unit, Character> =
+    (`in`([" ", "\t", "\r", "\n"], kind: "whitespace") ^^^ Unit.empty).rep()

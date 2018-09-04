@@ -1,11 +1,6 @@
 import XCTest
 import SwiftParserCombinators
 
-extension Parser where T == [Character] {
-    var stringParser: Parser<String, Element> {
-        return self ^^ { String($0) }
-    }
-}
 
 class SwiftParserCombinatorsTests: XCTestCase {
 
@@ -301,7 +296,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepNoMinNoMax() {
-        let parser =
+        let parser: Parser<[String], Character> =
             (char("a") ^^ String.init).rep()
 
         expectSuccess(parser: parser,
@@ -323,7 +318,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepMinNoMax() {
-        let parser =
+        let parser: Parser<[String], Character> =
             (char("a") ^^ String.init).rep(min: 2)
 
         expectFailure(parser: parser,
@@ -344,7 +339,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepMinMax() {
-        let parser =
+        let parser: Parser<[String], Character> =
             (char("a") ^^ String.init).rep(min: 2, max: 4)
 
         expectFailure(parser: parser,
@@ -371,7 +366,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepZeroMax() {
-        let parser =
+        let parser: Parser<[Character], Character> =
             char("a").rep(max: 0)
 
         expectSuccess(parser: parser,
@@ -386,7 +381,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepError() {
-        let parser =
+        let parser: Parser<[String], Character> =
             commit(char("a") ^^ String.init).rep(min: 1)
 
         expectSuccess(parser: parser,
@@ -408,7 +403,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepNoMinNoMax() {
-        let parser =
+        let parser: Parser<[Character], Character> =
             char("a").rep(separator: char(","))
 
         expectSuccess(parser: parser,
@@ -436,7 +431,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepMinNoMax() {
-        let parser =
+        let parser: Parser<[String], Character> =
             (char("a") ^^ String.init)
                 .rep(separator: char(","),
                      min: 2)
@@ -459,7 +454,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepMinMax() {
-        let parser =
+        let parser: Parser<[String], Character> =
             (char("a") ^^ String.init)
                 .rep(separator: char(","),
                      min: 2, max: 4)
@@ -488,7 +483,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testRepSepZeroMax() {
-        let parser =
+        let parser: Parser<[Character], Character> =
             char("a").rep(separator: char(","), max: 0)
 
         expectSuccess(parser: parser,
@@ -623,7 +618,9 @@ class SwiftParserCombinatorsTests: XCTestCase {
             char("/") ^^^ (/)
 
         let digit = `in`(.decimalDigits, kind: "digit")
-        let num = digit.rep(min: 1) ^^ { Int(String($0))! }
+        let num = digit.rep(min: 1) ^^ { (characters: [Character]) in
+            Int(String(characters))!
+        }
 
         let expr: Parser<Int, Character> =
             Parser.recursive { expr in
@@ -655,16 +652,21 @@ class SwiftParserCombinatorsTests: XCTestCase {
         )
 
         number = PackratParser(parser:
-            elem(kind: "digit", predicate: { "0"..."9" ~= $0 }).rep(min: 1) ^^ {
-                guard let number = Int(String($0)) else {
-                    throw MapError.failure("Invalid number: \($0)")
-                }
-                return number
+            elem(kind: "digit", predicate: { "0"..."9" ~= $0 })
+                .rep(min: 1)
+                .map { (characters: [Character]) in
+                    let string = String(characters)
+                    guard let number = Int(string) else {
+                        throw MapError.failure("Invalid number: \(string)")
+                    }
+                    return number
             }
         )
 
         sum = PackratParser(parser:
-            (exp ~ ("+" ~> exp)) ^^ { $0.reduce(0, +) }
+            (exp ~ ("+" ~> exp)) ^^ { (numbers: [Int]) in
+                numbers.reduce(0, +)
+            }
         )
 
         expectError(parser: exp,
@@ -710,7 +712,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSkipUntil() {
-        let p = skipUntil(char("y") ~ char("z"))
+        let p: Parser<[Character], Character> =
+            skipUntil(char("y") ~ char("z"))
 
         expectSuccess(parser: p,
                       input: "yz",
@@ -767,6 +770,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testFollowedBy", testFollowedBy),
         ("testChainLeft", testChainLeft),
         ("testLeftRecursion", testLeftRecursion),
-        ("testCapturing", testCapturing)
+        ("testCapturing", testCapturing),
+        ("testSkipUntil", testSkipUntil)
     ]
 }

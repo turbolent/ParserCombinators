@@ -14,7 +14,9 @@ extension Parser {
     ///          is allowed.
     ///   - max: The maximum number of times this parser is to be applied.
     ///
-    public func rep(min: Int = 0, max: Int? = nil) -> Parser<[T], Element> {
+    public func rep<U: Sequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
+        where U.Next == T, U.NextSequenced == U
+    {
         return SwiftParserCombinators.rep(self, min: min, max: max)
     }
 
@@ -26,7 +28,9 @@ extension Parser {
     ///                a non-fatal failure, i.e. not an error, and so backtracking
     ///                is allowed.
     ///
-    public func rep(n: Int) -> Parser<[T], Element> {
+    public func rep<U: Sequenceable>(n: Int) -> Parser<U, Element>
+        where U.Next == T, U.NextSequenced == U
+    {
         return SwiftParserCombinators.rep(self, min: n, max: n)
     }
 
@@ -41,19 +45,29 @@ extension Parser {
     ///          is allowed.
     ///   - max: The maximum number of times this parser is to be applied.
     ///
-    public func rep<U>(separator: @autoclosure @escaping () -> Parser<U, Element>,
-                       min: Int = 0, max: Int? = nil)
-        -> Parser<[T], Element>
+    public func rep<U, V: Sequenceable>(
+        separator: @autoclosure @escaping () -> Parser<U, Element>,
+        min: Int = 0, max: Int? = nil
+    )
+        -> Parser<V, Element>
+    where
+        V.Next == T,
+        V.Previous == T,
+        V.NextSequenced == V,
+        V.PreviousSequenced == V
     {
         return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
     }
 }
 
-private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
-                                 remaining: Reader<Element>,
-                                 elements: [T],
-                                 n: Int, min: Int = 0, max: Int?)
-    -> Trampoline<ParseResult<[T], Element>>
+private func repStep<T, U: Sequenceable, Element>(
+    lazyParser: Lazy<Parser<T, Element>>,
+    remaining: Reader<Element>,
+    elements: U,
+    n: Int, min: Int = 0, max: Int?
+)
+    -> Trampoline<ParseResult<U, Element>>
+    where U.Next == T, U.NextSequenced == U
 {
     return More {
         if n == max {
@@ -63,8 +77,7 @@ private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
         return lazyParser.value.step(remaining).flatMap { result in
             switch result {
             case let .success(value, rest):
-                var nextElements = elements
-                nextElements.append(value)
+                let nextElements = elements.sequence(next: value)
                 return repStep(lazyParser: lazyParser, remaining: rest, elements: nextElements,
                                n: n + 1, min: min, max: max)
 
@@ -96,9 +109,13 @@ private func repStep<T, Element>(lazyParser: Lazy<Parser<T, Element>>,
 ///          i.e. not an error, and so backtracking is allowed.
 ///   - max: The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
-                            min: Int = 0, max: Int? = nil)
-    -> Parser<[T], Element>
+public func rep<T, U: Sequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
+    -> Parser<U, Element>
+    where U.Next == T, U.NextSequenced == U
 {
     if let max = max {
         guard min <= max else {
@@ -106,14 +123,14 @@ public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Ele
         }
 
         if max == 0 {
-            return success([])
+            return success(U.empty)
         }
     }
 
     return Parser { input in
         let lazyParser = Lazy(parser)
 
-        return repStep(lazyParser: lazyParser, remaining: input, elements: [],
+        return repStep(lazyParser: lazyParser, remaining: input, elements: U.empty,
                        n: 0, min: min, max: max)
     }
 }
@@ -127,9 +144,12 @@ public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Ele
 ///        If the parser succeeds fewer times, the new parser returns a non-fatal failure,
 ///        i.e. not an error, and so backtracking is allowed.
 ///
-public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
-                            n: Int)
-    -> Parser<[T], Element>
+public func rep<T, U: Sequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    n: Int
+)
+    -> Parser<U, Element>
+    where U.Next == T, U.NextSequenced == U
 {
     return rep(parser, min: n, max: n)
 }
@@ -145,11 +165,18 @@ public func rep<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Ele
 ///          i.e. not an error, and so backtracking is allowed.
 ///   - max: The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
-                               separator: @autoclosure @escaping () -> Parser<U, Element>,
-                               min: Int = 0,
-                               max: Int? = nil)
-    -> Parser<[T], Element>
+public func rep<T, U, V: Sequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    separator: @autoclosure @escaping () -> Parser<U, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
+    -> Parser<V, Element>
+where
+    V.Next == T,
+    V.Previous == T,
+    V.NextSequenced == V,
+    V.PreviousSequenced == V
 {
     if let max = max {
         guard min <= max else {
@@ -157,16 +184,18 @@ public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, 
         }
 
         if max == 0 {
-            return success([])
+            return success(V.empty)
         }
     }
 
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let repeatingParser: Parser<[T], Element> = {
+    let repeatingParser: Parser<V, Element> = {
         if let max = max, max == 1 {
-            return lazyParser.value ^^ { [$0] }
+            return lazyParser.value.map {
+                V.empty.sequence(next: $0)
+            }
         }
 
         let repeatingMax: Int? = {
@@ -177,9 +206,10 @@ public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, 
             return nil
         }()
 
-        let more = rep(lazySeparator.value.seqIgnoreLeft(lazyParser.value),
-                       min: min - 1,
-                       max: repeatingMax)
+        let more: Parser<V, Element> =
+            rep(lazySeparator.value.seqIgnoreLeft(lazyParser.value),
+                min: min - 1,
+                max: repeatingMax)
 
         return lazyParser.value.seq(more)
     }()
@@ -188,7 +218,7 @@ public func rep<T, U, Element>(_ parser: @autoclosure @escaping () -> Parser<T, 
         return repeatingParser
     }
 
-    let successParser: Parser<[T], Element> = success([])
+    let successParser: Parser<V, Element> = success(V.empty)
 
-    return repeatingParser || successParser
+    return repeatingParser.or(successParser)
 }

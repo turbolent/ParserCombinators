@@ -48,12 +48,14 @@ public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<
                                   max: Int? = nil)
     -> Parser<T, Element>
 {
+    typealias Op = (T, T) -> T
+
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
     let repeatingParser =
         lazyParser.value.seq(lazySeparator.value.seq(lazyParser.value).rep(min: min, max: max))
-            ^^ { firstAndRest -> T in
+            ^^ { (firstAndRest: (T, [(Op, T)])) -> T in
                 let (first, rest) = firstAndRest
                 return rest.reduce(first) { result, opAndValue -> T in
                     let (op, value) = opAndValue

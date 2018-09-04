@@ -90,3 +90,9 @@ func expectError<T>(parser: Parser<T, Character>, input: String,
         }
     }
 }
+
+extension Parser where T == [Character] {
+    var stringParser: Parser<String, Element> {
+        return self ^^ { String($0) }
+    }
+}

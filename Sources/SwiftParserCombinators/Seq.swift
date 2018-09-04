@@ -21,20 +21,23 @@ extension Parser {
     }
 
     /// Creates a new parser that applies this parser and the next parser in sequence, and returns
-    /// the results of both in an array. The next parser is applied to the input left over by this parser.
+    /// the results of both sequenced. The next parser is applied to the input left over by this parser.
     /// The new parser succeeds if (and only if) both parsers succeed.
     ///
     /// - Note: The next parser is only applied if this parser succeeds.
     ///
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
-    public func seq(_ next: @autoclosure @escaping () -> Parser<T, Element>)
-        -> Parser<[T], Element>
+    public func seq<U: Sequenceable>(_ next: @autoclosure @escaping () -> Parser<T, Element>)
+        -> Parser<U, Element>
+        where U.Next == T, U.NextSequenced == U
     {
         let lazyNext = Lazy(next)
         return flatMap { firstResult in
             lazyNext.value.map { secondResult in
-                [firstResult, secondResult]
+                U.empty
+                    .sequence(next: firstResult)
+                    .sequence(next: secondResult)
             }
         }
     }
@@ -48,8 +51,8 @@ extension Parser {
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
     public func seq<U: Sequenceable>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
-        -> Parser<U.PreviousSequenced, Element>
-        where U.Previous == T
+        -> Parser<U, Element>
+        where U.Previous == T, U.PreviousSequenced == U
     {
         let lazyNext = Lazy(next)
         return flatMap { firstResult in
@@ -147,8 +150,8 @@ extension Parser where T: Sequenceable {
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
     public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
-        -> Parser<T.NextSequenced, Element>
-        where T.Next == U
+        -> Parser<T, Element>
+        where T.Next == U, T.NextSequenced == T
     {
         let lazyNext = Lazy(next)
         return flatMap { firstResult in
@@ -267,8 +270,8 @@ public func ~ <T: AnySequenceable, Element>(first: Parser<T, Element>,
 
 public func ~ <T: Sequenceable, U, Element>(first: Parser<T, Element>,
                                             second: @autoclosure @escaping () -> Parser<U, Element>)
-    -> Parser<T.NextSequenced, Element>
-    where T.Next == U
+    -> Parser<T, Element>
+    where T.Next == U, T.NextSequenced == T
 {
     return first.seq(second)
 }
@@ -303,8 +306,8 @@ public func ~ <T: AnySequenceable, U, Element>(first: Parser<T, Element>,
 ///
 public func ~ <T, U: Sequenceable, Element>(first: Parser<T, Element>,
                                             second: @autoclosure @escaping () -> Parser<U, Element>)
-    -> Parser<U.PreviousSequenced, Element>
-    where U.Previous == T
+    -> Parser<U, Element>
+    where U.Previous == T, U.PreviousSequenced == U
 {
     return first.seq(second)
 }
@@ -327,7 +330,7 @@ public func ~ <T, U: AnySequenceable, Element>(first: Parser<T, Element>,
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
-/// the results of both in an array. The second parser is applied to the input left over by the first parser.
+/// the results of both sequenced. The second parser is applied to the input left over by the first parser.
 /// The new parser succeeds if (and only if) both parsers succeed.
 ///
 /// - Note: The second parser is only applied if the first parser succeeds.
@@ -336,9 +339,10 @@ public func ~ <T, U: AnySequenceable, Element>(first: Parser<T, Element>,
 ///   - first: The parser to be applied first.
 ///   - second: The parser to be applied after the first parser suceeded.
 ///
-public func ~ <T, Element>(first: Parser<T, Element>,
-                           second: @autoclosure @escaping () -> Parser<T, Element>)
-    -> Parser<[T], Element>
+public func ~ <T, U: Sequenceable, Element>(first: Parser<T, Element>,
+                                            second: @autoclosure @escaping () -> Parser<T, Element>)
+    -> Parser<U, Element>
+    where U.Next == T, U.NextSequenced == U
 {
     return first.seq(second)
 }

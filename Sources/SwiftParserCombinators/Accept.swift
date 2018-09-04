@@ -68,7 +68,7 @@ public func char(_ char: Character) -> Parser<Character, Character> {
     return accept(char)
 }
 
-/// Create a parser that accepts a single character, which needs to be in the set of valid characters,
+/// Create a parser that accepts a single character, which must be in the set of valid characters,
 /// and returns the parsed character.
 ///
 /// - Parameters:
@@ -80,5 +80,18 @@ public func `in`(_ characters: CharacterSet, kind: String = "") -> Parser<Charac
         !$0.unicodeScalars.contains {
             !characters.contains($0)
         }
+    }
+}
+
+/// Create a parser that accepts a single character, which must not be in the set of invalid characters,
+/// and returns the parsed character.
+///
+/// - Parameters:
+///   - characters: The set of invalid characters.
+///   - kind: The element kind, used for error messages.
+///
+public func notIn(_ characters: CharacterSet, kind: String = "") -> Parser<Character, Character> {
+    return elem(kind: kind) {
+        !$0.unicodeScalars.contains(where: characters.contains)
     }
 }

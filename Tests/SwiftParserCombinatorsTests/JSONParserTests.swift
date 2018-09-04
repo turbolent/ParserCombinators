@@ -48,21 +48,19 @@ class JSONParsers {
     typealias VoidParser = Parser<Void, Character>
     typealias JSONParser = Parser<JSON, Character>
 
-    static func json() -> JSONParser {
-        return withWhitespace(value())
-    }
+    static let json: JSONParser =
+        withWhitespace(value)
 
-    static func value() -> JSONParser {
-        return primitive()
-            || objectValue()
-            || arrayValue()
-            || numberValue()
-            || stringValue()
-    }
+    static let value: JSONParser =
+        primitive
+            || numberValue
+            || stringValue
+            || objectValue
+            || arrayValue
 
-    static func primitive() -> JSONParser {
-        return rep(`in`(.lowercaseLetters)) ^^ {
-            switch String($0) {
+    static let primitive: JSONParser =
+        `in`(.lowercaseLetters).rep().stringParser ^^ {
+            switch $0 {
             case "false":
                 return .bool(false)
             case "true":
@@ -73,18 +71,17 @@ class JSONParsers {
                 throw MapError.failure("invalid characters: \(letters)")
             }
         }
-    }
 
-    static func objectValue() -> JSONParser {
-        let keyValue = withWhitespace(string()) ~ (structureChar(":") ~> json())
-        let content = rep(keyValue, separator: char(",")) ^^ JSON.object
+    static let objectValue: JSONParser = {
+        let keyValue = withWhitespace(string) ~ (structureChar(":") ~> json)
+        let content = keyValue.rep(separator: char(",")) ^^ JSON.object
         return structure(start: "{", content: content, end: "}")
-    }
+    }()
 
-    static func arrayValue() -> JSONParser {
-        let content = rep(json(), separator: char(",")) ^^ JSON.array
+    static let arrayValue: JSONParser = {
+        let content = json.rep(separator: char(",")) ^^ JSON.array
         return structure(start: "[", content: content, end: "]")
-    }
+    }()
 
     static func structure<T>(start: Character, content: Parser<T, Character>, end: Character)
         -> Parser<T, Character>
@@ -95,42 +92,30 @@ class JSONParsers {
     static func structureChar(_ character: Character) -> VoidParser {
         return withWhitespace(char(character)) ^^^ ()
     }
+    
+    static let hexDigit = `in`(hexDigits, kind: "hex-digit")
 
-    static func `in`(_ characters: CharacterSet, kind: String = "") -> CharacterParser {
-        return elem(kind: kind) { !$0.unicodeScalars.contains { !characters.contains($0) } }
-    }
+    static let unicodeBlock: Parser<[Character], Character> = hexDigit.rep(n: 4)
 
-    static func notIn(_ characters: CharacterSet, kind: String = "") -> CharacterParser {
-        return elem(kind: kind) { !$0.unicodeScalars.contains(where: characters.contains) }
-    }
+    static let doubleQuote = char("\"") ^^^ Character("\"")
+    static let backslash = char("\\") ^^^ Character("\\")
+    static let slash = char("/") ^^^ Character("/")
+    static let bEscape = char("b") ^^^ Character("\u{8}")
+    static let fEscape = char("f") ^^^ Character("\u{12}")
+    static let nEscape = char("n") ^^^ Character("\n")
+    static let rEscape = char("r") ^^^ Character("\r")
+    static let tEscape = char("t") ^^^ Character("\t")
 
-    static func hexDigit() -> CharacterParser {
-        return `in`(hexDigits, kind: "hex-digit")
-    }
-
-    static func unicodeBlock() -> CharactersParser {
-        return hexDigit().rep(n: 4)
-    }
-
-    static func charSeq() -> CharacterParser {
-        return char("\\") ~> (
-               char("\"") ^^^ Character("\"")
-            || char("\\") ^^^ Character("\\")
-            || char("/")  ^^^ Character("/")
-            || char("b")  ^^^ Character("\u{8}")
-            || char("f")  ^^^ Character("\u{12}")
-            || char("n")  ^^^ Character("\n")
-            || char("r")  ^^^ Character("\r")
-            || char("t")  ^^^ Character("\t")
-            || (char("u") ~> unicodeBlock())
-                .rep(separator: char("\\"), max: 2) ^^ {
-                    let codepoint: Int
-                    if $0.count > 1 {
-                        let high = parseHex(String($0[0]))
-                        let low = parseHex(String($0[1]))
+    static let unicodeEscape: Parser<Character, Character> =
+        (char("u") ~> unicodeBlock)
+            .rep(separator: char("\\"), max: 2) ^^ { (characters: [[Character]]) -> Character in
+                let codepoint: Int
+                    if characters.count > 1 {
+                        let high = parseHex(String(characters[0]))
+                        let low = parseHex(String(characters[1]))
                         codepoint = decodeSurrogatePair(high: high, low: low)
                     } else {
-                        codepoint = parseHex(String($0[0]))
+                        codepoint = parseHex(String(characters[0]))
                     }
 
                     guard let unicodeScalar = Unicode.Scalar(codepoint) else {
@@ -138,8 +123,19 @@ class JSONParsers {
                     }
                     return Character(unicodeScalar)
                 }
+
+    static let charSeq =
+        char("\\") ~> (
+            doubleQuote
+            || backslash
+            || slash
+            || bEscape
+            || fEscape
+            || nEscape
+            || rEscape
+            || tEscape
+            || unicodeEscape
         )
-    }
 
     static func parseHex(_ value: String) -> Int {
         guard let codepoint = Int(value, radix: 16) else {
@@ -152,17 +148,16 @@ class JSONParsers {
         return ((high - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
     }
 
-    static func stringValue() -> JSONParser {
-        return string() ^^ JSON.string
-    }
+    static let stringValue = string ^^ JSON.string
 
-    static func string() -> StringParser {
-        let content = rep(charSeq() || notIn(CharacterSet(["\"", "\n"])))
-        return ((char("\"") ~> content) <~ char("\"")) ^^ { String($0) }
-    }
+    static let string: StringParser = {
+        let content: Parser<[Character], Character> =
+            (charSeq || notIn(["\"", "\n"])).rep()
+        return ((char("\"") ~> content) <~ char("\"")).stringParser
+    }()
 
-    static func numberValue() -> JSONParser {
-        return opt(char("-") ^^ String.init) ~ intPart() ~ opt(fracPart()) ~ opt(expPart()) ^^ {
+    static let numberValue: JSONParser =
+        opt(char("-") ^^ String.init) ~ intPart ~ opt(fracPart) ~ opt(expPart) ^^ {
             let (minus, intPart, fracPart, expPart) = $0
             let value = optString("", minus) + intPart + optString(".", fracPart) + optString("", expPart)
             guard let double = Double(value) else {
@@ -170,48 +165,32 @@ class JSONParsers {
             }
             return .number(double)
         }
-    }
 
-    static func sign() -> StringParser {
-        return elem(kind: "sign") { $0 == "-" || $0 == "+" } ^^ String.init
-    }
+    static let sign: StringParser =
+        elem(kind: "sign") { $0 == "-" || $0 == "+" } ^^ String.init
 
-    static func exponent() -> StringParser {
-        return elem(kind: "exponent") { $0 == "e" || $0 == "E" } ^^ String.init
-    }
+    static let exponent: StringParser =
+        elem(kind: "exponent") { $0 == "e" || $0 == "E" } ^^ String.init
 
-    static func nonZero() -> CharacterParser {
-        return elem(kind: "non-zero digit") { $0 >= "1" && $0 <= "9" }
-    }
+    static let nonZero: CharacterParser =
+        elem(kind: "non-zero digit") { $0 >= "1" && $0 <= "9" }
 
-    static func zero() -> StringParser {
-        return "0" ^^^ "0"
-    }
+    static let zero: StringParser = "0" ^^^ "0"
 
-    static func digit() -> CharacterParser {
-        return `in`(.decimalDigits, kind: "digit")
-    }
+    static let digit = `in`(.decimalDigits, kind: "digit")
 
-    static func intPart() -> StringParser {
-        return zero() || intList()
-    }
+    static let intPart = zero || intList
 
-    static func intList() -> StringParser {
-        return nonZero() ~ rep(digit()) ^^ {
-            return String($0)
-        }
-    }
+    static let intList = (nonZero ~ digit.rep()).stringParser
 
-    static func fracPart() -> StringParser {
-        return ("." ~> rep(digit())) ^^ { String($0) }
-    }
+    static let fracPart = ("." ~> digit.rep()).stringParser
 
-    static func expPart() -> StringParser {
-        return exponent() ~ opt(sign()) ~ rep(digit(), min: 1) ^^ {
-            let (exponent, sign, digits) = $0
-            return exponent + optString("", sign) + String(digits)
-        }
-    }
+    static let expPart: StringParser =
+        (exponent ~ opt(sign) ~ digit.rep(min: 1))
+            .map { (parts: (String, String?, [Character])) in
+                let (exponent, sign, digits) = parts
+                return exponent + optString("", sign) + String(digits)
+            }
 
     private static func optString(_ pre: String, _ value: String?) -> String {
         guard let value = value else {
@@ -225,39 +204,48 @@ class JSONParsers {
 class JSONParserTests: XCTestCase {
 
     func testUnicode() {
-        expectSuccess(parser: JSONParsers.unicodeBlock() ^^ { String($0) },
+        expectSuccess(parser: JSONParsers.unicodeBlock ^^ { String($0) },
                       input: "09Af",
                       expected: "09Af")
     }
 
     func testCharSeqUnicode() {
-        expectSuccess(parser: JSONParsers.charSeq(),
+        expectSuccess(parser: JSONParsers.charSeq,
                       input: "\\u09Af",
                       expected: "য")
     }
 
     func testCharSeqUnicodeMultiple() {
-        expectSuccess(parser: JSONParsers.charSeq(),
+        expectSuccess(parser: JSONParsers.charSeq,
                       input: "\\uD834\\uDD1E",
                       expected: "𝄞")
     }
 
     func testString() {
-        expectSuccess(parser: JSONParsers.string(),
+        expectSuccess(parser: JSONParsers.string,
                       input: "\"This is\\n a \\b test\"",
                       expected: "This is\n a \u{8} test")
     }
 
     func testJSON() {
-        expectSuccess(parser: JSONParsers.json(),
-                      input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] ",
-                      expected: JSON.array([.null, .bool(true), .bool(false), .string("test"),
-                                            .array([.object([]),
-                                                    .object([]),
-                                                    .object([
-                                                        (" ", .string("23")),
-                                                        ("", .number(42.23))
-                                                        ])])]))
+        expectSuccess(
+            parser: JSONParsers.json,
+            input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] ",
+            expected: JSON.array([
+              .null,
+              .bool(true),
+              .bool(false),
+              .string("test"),
+              .array([
+                  .object([]),
+                  .object([]),
+                  .object([
+                      (" ", .string("23")),
+                      ("", .number(42.23))
+                  ])
+              ])
+            ])
+        )
     }
 
     static var allTests = [

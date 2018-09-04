@@ -7,13 +7,40 @@ public protocol Sequenceable {
     associatedtype Previous
     associatedtype Next
 
+    static var empty: Self { get }
+
     func sequence(other: Self) -> SelfSequenced
     func sequence(previous: Previous) -> PreviousSequenced
     func sequence(next: Next) -> NextSequenced
 }
 
 
+public struct Unit {
+    public static let empty = Unit()
+    private init() {}
+}
+
+
+extension Unit: Sequenceable {
+
+    public func sequence(other: Unit) -> Unit {
+        return .empty
+    }
+
+    public func sequence(previous: Unit) -> Unit {
+        return .empty
+    }
+
+    public func sequence(next: Unit) -> Unit {
+        return .empty
+    }
+}
+
 extension Array: Sequenceable {
+
+    public static var empty: Array<Element> {
+        return []
+    }
 
     public func sequence(other: [Element]) -> [Element] {
         var result = self
