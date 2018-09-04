@@ -60,14 +60,14 @@ extension Parser {
     }
 }
 
-private func repStep<T, U: Sequenceable, Element>(
+private func repStep<T, U, Element>(
     lazyParser: Lazy<Parser<T, Element>>,
     remaining: Reader<Element>,
     elements: U,
-    n: Int, min: Int = 0, max: Int?
+    n: Int, min: Int = 0, max: Int?,
+    sequence: @escaping (U, T) -> U
 )
     -> Trampoline<ParseResult<U, Element>>
-    where U.Next == T, U.NextSequenced == U
 {
     return More {
         if n == max {
@@ -77,9 +77,9 @@ private func repStep<T, U: Sequenceable, Element>(
         return lazyParser.value.step(remaining).flatMap { result in
             switch result {
             case let .success(value, rest):
-                let nextElements = elements.sequence(next: value)
+                let nextElements = sequence(elements, value)
                 return repStep(lazyParser: lazyParser, remaining: rest, elements: nextElements,
-                               n: n + 1, min: min, max: max)
+                               n: n + 1, min: min, max: max, sequence: sequence)
 
             case let .failure(message2, remaining2):
                 guard n >= min else {
@@ -117,21 +117,45 @@ public func rep<T, U: Sequenceable, Element>(
     -> Parser<U, Element>
     where U.Next == T, U.NextSequenced == U
 {
+    return rep(
+        parser,
+        min: min,
+        max: max,
+        empty: { U.empty },
+        sequence: { $0.sequence(next: $1) }
+    )
+}
+
+private func rep<T, U, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    min: Int = 0,
+    max: Int? = nil,
+    empty: @escaping () -> U,
+    sequence: @escaping (U, T) -> U
+)
+    -> Parser<U, Element>
+{
     if let max = max {
         guard min <= max else {
             fatalError("Can't parse min \(min) times and max \(max) times")
         }
 
         if max == 0 {
-            return success(U.empty)
+            return success(empty())
         }
     }
 
+    let lazyParser = Lazy(parser)
     return Parser { input in
-        let lazyParser = Lazy(parser)
-
-        return repStep(lazyParser: lazyParser, remaining: input, elements: U.empty,
-                       n: 0, min: min, max: max)
+        repStep(
+            lazyParser: lazyParser,
+            remaining: input,
+            elements: empty(),
+            n: 0,
+            min: min,
+            max: max,
+            sequence: sequence
+        )
     }
 }
 
@@ -178,13 +202,35 @@ where
     V.NextSequenced == V,
     V.PreviousSequenced == V
 {
+    return rep(
+        parser,
+        separator: separator,
+        min: min,
+        max: max,
+        empty: { V.empty },
+        sequenceValues: { $0.sequence(next: $1) },
+        sequenceParsers: { $0.seq($1) }
+    )
+}
+
+private func rep<T, U, V, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    separator: @autoclosure @escaping () -> Parser<U, Element>,
+    min: Int = 0,
+    max: Int? = nil,
+    empty: @escaping () -> V,
+    sequenceValues: @escaping (V, T) -> V,
+    sequenceParsers: @escaping (Parser<T, Element>, Parser<V, Element>) -> Parser<V, Element>
+)
+    -> Parser<V, Element>
+{
     if let max = max {
         guard min <= max else {
             fatalError("Can't parse min \(min) times and max \(max) times")
         }
 
         if max == 0 {
-            return success(V.empty)
+            return success(empty())
         }
     }
 
@@ -194,7 +240,8 @@ where
     let repeatingParser: Parser<V, Element> = {
         if let max = max, max == 1 {
             return lazyParser.value.map {
-                V.empty.sequence(next: $0)
+                // TODO: enough to call empty once?
+                sequenceValues(empty(), $0)
             }
         }
 
@@ -209,16 +256,18 @@ where
         let more: Parser<V, Element> =
             rep(lazySeparator.value.seqIgnoreLeft(lazyParser.value),
                 min: min - 1,
-                max: repeatingMax)
+                max: repeatingMax,
+                empty: empty,
+                sequence: sequenceValues)
 
-        return lazyParser.value.seq(more)
+        return sequenceParsers(lazyParser.value, more)
     }()
 
     if min > 0 {
         return repeatingParser
     }
 
-    let successParser: Parser<V, Element> = success(V.empty)
+    let successParser: Parser<V, Element> = success(empty())
 
     return repeatingParser.or(successParser)
 }
