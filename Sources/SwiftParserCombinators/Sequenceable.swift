@@ -1,17 +1,12 @@
 
 public protocol Sequenceable {
-    associatedtype SelfSequenced
-    associatedtype PreviousSequenced
-    associatedtype NextSequenced
-
-    associatedtype Previous
-    associatedtype Next
+    associatedtype Element
 
     static var empty: Self { get }
 
-    func sequence(other: Self) -> SelfSequenced
-    func sequence(previous: Previous) -> PreviousSequenced
-    func sequence(next: Next) -> NextSequenced
+    func sequence(other: Self) -> Self
+    func sequence(previous: Element) -> Self
+    func sequence(next: Element) -> Self
 }
 
 
@@ -22,6 +17,7 @@ public struct Unit {
 
 
 extension Unit: Sequenceable {
+    public typealias Element = Unit
 
     public func sequence(other: Unit) -> Unit {
         return .empty
@@ -62,12 +58,9 @@ extension Array: Sequenceable {
 }
 
 public protocol AnySequenceable {
-    associatedtype SelfSequenced
-    associatedtype PreviousAnySequenced
-    associatedtype NextAnySequenced
+    static var empty: Self { get }
 
-    func sequence(other: Self) -> SelfSequenced
-    func sequence(previous: Any) -> PreviousAnySequenced
-    func sequence(next: Any) -> NextAnySequenced
-
+    func sequence(other: Self) -> Self
+    func sequence(previous: Any) -> Self
+    func sequence(next: Any) -> Self
 }

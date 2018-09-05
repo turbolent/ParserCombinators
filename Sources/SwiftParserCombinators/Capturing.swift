@@ -39,6 +39,10 @@ extension Parser where T == Captures {
 
 extension Captures: AnySequenceable {
 
+    public static var empty: Captures {
+        return Captures(values: [], entries: [:])
+    }
+
     public func sequence(other: Captures) -> Captures {
         var values = self.values
         values.append(contentsOf: other.values)
@@ -54,14 +58,22 @@ extension Captures: AnySequenceable {
     }
 
     public func sequence(previous: Any) -> Captures {
-        var values = [previous]
-        values.append(contentsOf: self.values)
-        return Captures(values: values, entries: entries)
+        if let other = previous as? Captures {
+            return sequence(other: other)
+        } else {
+            var values = [previous]
+            values.append(contentsOf: self.values)
+            return Captures(values: values, entries: entries)
+        }
     }
 
     public func sequence(next: Any) -> Captures {
-        var values = self.values
-        values.append(next)
-        return Captures(values: values, entries: entries)
+        if let other = next as? Captures {
+            return sequence(other: other)
+        } else {
+            var values = self.values
+            values.append(next)
+            return Captures(values: values, entries: entries)
+        }
     }
 }

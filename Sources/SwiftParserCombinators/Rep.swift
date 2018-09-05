@@ -15,8 +15,22 @@ extension Parser {
     ///   - max: The maximum number of times this parser is to be applied.
     ///
     public func rep<U: Sequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
-        where U.Next == T, U.NextSequenced == U
+        where U.Element == T
     {
+        return SwiftParserCombinators.rep(self, min: min, max: max)
+    }
+
+    /// Creates a new parser that repeatedly applies this parser until it fails,
+    /// and returns all parsed values.
+    ///
+    /// - Parameters:
+    ///   - min: The minumum number of times this parser needs to succeed.
+    ///          If the parser succeeds fewer times, the new parser returns
+    ///          a non-fatal failure, i.e. not an error, and so backtracking
+    ///          is allowed.
+    ///   - max: The maximum number of times this parser is to be applied.
+    ///
+    public func rep<U: AnySequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element> {
         return SwiftParserCombinators.rep(self, min: min, max: max)
     }
 
@@ -29,8 +43,20 @@ extension Parser {
     ///                is allowed.
     ///
     public func rep<U: Sequenceable>(n: Int) -> Parser<U, Element>
-        where U.Next == T, U.NextSequenced == U
+        where U.Element == T
     {
+        return SwiftParserCombinators.rep(self, min: n, max: n)
+    }
+
+    /// Creates a new parser that repeatedly applies this parser the given number of times,
+    /// and returns all parsed values.
+    ///
+    /// - Parameter n: The number of times this parser is applied and needs to succeed.
+    ///                If the parser succeeds fewer times, the new parser returns
+    ///                a non-fatal failure, i.e. not an error, and so backtracking
+    ///                is allowed.
+    ///
+    public func rep<U: AnySequenceable>(n: Int) -> Parser<U, Element> {
         return SwiftParserCombinators.rep(self, min: n, max: n)
     }
 
@@ -50,11 +76,27 @@ extension Parser {
         min: Int = 0, max: Int? = nil
     )
         -> Parser<V, Element>
-    where
-        V.Next == T,
-        V.Previous == T,
-        V.NextSequenced == V,
-        V.PreviousSequenced == V
+        where V.Element == T
+    {
+        return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
+    }
+
+    /// Creates a new parser that repeatedly applies this parser interleaved with
+    /// the separating parser, until it fails, and returns all parsed values.
+    ///
+    /// - Parameters:
+    ///   - separator: The parser that separates the occurrences of this parser.
+    ///   - min: The minumum number of times this parser needs to succeed.
+    ///          If the parser succeeds fewer times, the new parser returns
+    ///          a non-fatal failure, i.e. not an error, and so backtracking
+    ///          is allowed.
+    ///   - max: The maximum number of times this parser is to be applied.
+    ///
+    public func rep<U, V: AnySequenceable>(
+        separator: @autoclosure @escaping () -> Parser<U, Element>,
+        min: Int = 0, max: Int? = nil
+    )
+        -> Parser<V, Element>
     {
         return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
     }
@@ -99,33 +141,6 @@ private func repStep<T, U, Element>(
     }
 }
 
-/// Creates a new parser that repeatedly applies the given parser until it fails,
-/// and returns all parsed values.
-///
-/// - Parameters:
-///   - parser: The parser to be applied successively to the input.
-///   - min: The minumum number of times the given parser needs to succeed.
-///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
-///          i.e. not an error, and so backtracking is allowed.
-///   - max: The maximum number of times the given parser is to be applied.
-///
-public func rep<T, U: Sequenceable, Element>(
-    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
-    min: Int = 0,
-    max: Int? = nil
-)
-    -> Parser<U, Element>
-    where U.Next == T, U.NextSequenced == U
-{
-    return rep(
-        parser,
-        min: min,
-        max: max,
-        empty: { U.empty },
-        sequence: { $0.sequence(next: $1) }
-    )
-}
-
 private func rep<T, U, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     min: Int = 0,
@@ -159,6 +174,59 @@ private func rep<T, U, Element>(
     }
 }
 
+/// Creates a new parser that repeatedly applies the given parser until it fails,
+/// and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - min: The minumum number of times the given parser needs to succeed.
+///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///          i.e. not an error, and so backtracking is allowed.
+///   - max: The maximum number of times the given parser is to be applied.
+///
+public func rep<T, U: Sequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
+    -> Parser<U, Element>
+    where U.Element == T
+{
+    return rep(
+        parser,
+        min: min,
+        max: max,
+        empty: { U.empty },
+        sequence: { $0.sequence(next: $1) }
+    )
+}
+
+/// Creates a new parser that repeatedly applies the given parser until it fails,
+/// and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - min: The minumum number of times the given parser needs to succeed.
+///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///          i.e. not an error, and so backtracking is allowed.
+///   - max: The maximum number of times the given parser is to be applied.
+///
+public func rep<T, U: AnySequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
+    -> Parser<U, Element>
+{
+    return rep(
+        parser,
+        min: min,
+        max: max,
+        empty: { U.empty },
+        sequence: { $0.sequence(next: $1) }
+    )
+}
+
 /// Creates a new parser that repeatedly applies the given parser the given number of times,
 /// and returns all parsed values.
 ///
@@ -173,7 +241,25 @@ public func rep<T, U: Sequenceable, Element>(
     n: Int
 )
     -> Parser<U, Element>
-    where U.Next == T, U.NextSequenced == U
+    where U.Element == T
+{
+    return rep(parser, min: n, max: n)
+}
+
+/// Creates a new parser that repeatedly applies the given parser the given number of times,
+/// and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - n: The number of times the given parser is applied and needs to succeed.
+///        If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///        i.e. not an error, and so backtracking is allowed.
+///
+public func rep<T, U: AnySequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    n: Int
+)
+    -> Parser<U, Element>
 {
     return rep(parser, min: n, max: n)
 }
@@ -196,11 +282,37 @@ public func rep<T, U, V: Sequenceable, Element>(
     max: Int? = nil
 )
     -> Parser<V, Element>
-where
-    V.Next == T,
-    V.Previous == T,
-    V.NextSequenced == V,
-    V.PreviousSequenced == V
+    where V.Element == T
+{
+    return rep(
+        parser,
+        separator: separator,
+        min: min,
+        max: max,
+        empty: { V.empty },
+        sequenceValues: { $0.sequence(next: $1) },
+        sequenceParsers: { $0.seq($1) }
+    )
+}
+
+/// Creates a new parser that repeatedly applies the given parser interleaved with
+/// the separating parser, until it fails, and returns all parsed values.
+///
+/// - Parameters:
+///   - parser: The parser to be applied successively to the input.
+///   - separator: The parser that separates the occurrences of the given parser.
+///   - min: The minumum number of times the given parser needs to succeed.
+///          If the parser succeeds fewer times, the new parser returns a non-fatal failure,
+///          i.e. not an error, and so backtracking is allowed.
+///   - max: The maximum number of times the given parser is to be applied.
+///
+public func rep<T, U, V: AnySequenceable, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    separator: @autoclosure @escaping () -> Parser<U, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
+    -> Parser<V, Element>
 {
     return rep(
         parser,
