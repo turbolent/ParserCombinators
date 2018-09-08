@@ -2,6 +2,42 @@
 import Trampoline
 import Foundation
 
+/// Create a parser that accept any input element and returns the parsed element.
+public func accept<Element>() -> Parser<Element, Element> {
+    return Parser { input in
+        guard !input.atEnd else {
+            return Done(.failure(message: "end of input",
+                                 remaining: input))
+        }
+
+        let element = input.first
+
+        return Done(.success(value: element,
+                             remaining: input.rest()))
+    }
+}
+
+extension Parser {
+
+    public func filter(
+        errorMessageSupplier: ((_ invalidElement: T) -> String)? = nil,
+        _ predicate: @escaping (_ value: T) -> Bool
+    )
+        -> Parser<T, Element>
+    {
+        return map { value in
+
+            guard predicate(value) else {
+                let message = errorMessageSupplier?(value)
+                    ?? "Value did not match predicate: \(value)"
+                throw MapError.failure(message)
+            }
+
+            return value
+        }
+    }
+}
+
 /// Create a parser that accepts a single input element that satisfies a given predicate,
 /// and returns the parsed element.
 ///
@@ -11,27 +47,15 @@ import Foundation
 ///   - element: The input element to be tested.
 ///   - invalidElement: The input element which did not satisfy the predicate.
 ///
-public func acceptIf<Element>(predicate: @escaping (_ element: Element) -> Bool,
-                              errorMessageSupplier: @escaping (_ invalidElement: Element) -> String)
+public func acceptIf<Element>(
+    errorMessageSupplier: @escaping (_ invalidElement: Element) -> String,
+    _ predicate: @escaping (_ element: Element) -> Bool
+)
     -> Parser<Element, Element>
 {
-    return Parser { input in
-        guard !input.atEnd else {
-            return Done(.failure(message: "end of input",
-                                 remaining: input))
-        }
-
-        let element = input.first
-
-        guard predicate(element) else {
-            let message = errorMessageSupplier(element)
-            return Done(.failure(message: message,
-                                 remaining: input))
-        }
-
-        return Done(.success(value: element,
-                             remaining: input.rest()))
-    }
+    return accept()
+        .filter(errorMessageSupplier: errorMessageSupplier,
+                predicate)
 }
 
 /// Create a parser that accepts a single input element that satisfies a given predicate,
@@ -45,8 +69,8 @@ public func elem<Element>(kind: String, predicate: @escaping (Element) -> Bool)
     -> Parser<Element, Element>
     where Element: Equatable
 {
-    return acceptIf(predicate: predicate,
-                    errorMessageSupplier: { e in "\(kind) expected" })
+    return acceptIf(errorMessageSupplier: { e in "\(kind) expected" },
+                    predicate)
 }
 
 /// Create a parser that accepts a single input element and returns the parsed element (i.e. `element`).
@@ -56,8 +80,9 @@ public func elem<Element>(kind: String, predicate: @escaping (Element) -> Bool)
 public func accept<Element>(_ element: Element) -> Parser<Element, Element>
     where Element: Equatable
 {
-    return acceptIf(predicate: { $0 == element },
-                    errorMessageSupplier: { e in "expected \(element) but found \(e)" })
+    return acceptIf(errorMessageSupplier: { e in "expected \(element) but found \(e)" }) {
+        $0 == element
+    }
 }
 
 /// Create a parser that accepts a single character and returns the parsed character (i.e. `char`).
