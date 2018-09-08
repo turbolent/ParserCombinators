@@ -11,6 +11,10 @@ public struct Captures {
         self.entries = entries
     }
 
+    public init(value: Any) {
+        self.init(values: [value], entries: [:])
+    }
+
     fileprivate func with(name: String, values: Values) -> Captures {
         var next = self
         if next.entries[name] != nil {
