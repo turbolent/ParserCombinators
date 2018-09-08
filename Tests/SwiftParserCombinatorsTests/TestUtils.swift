@@ -27,6 +27,20 @@ func expectSuccess<T>(parser: Parser<T, Character>, input: String, expected: T,
     }
 }
 
+func expectSuccess<T>(parser: Parser<T, Character>, input: String,
+                      usePackratReader: Bool = false)
+    where T: Equatable
+{
+    let result = parse(parser: parser, input: input,
+                       usePackratReader: usePackratReader)
+    switch result {
+    case .success:
+        break
+    case .failure, .error:
+        XCTFail(String(describing: result))
+    }
+}
+
 func expectSuccess<T>(parser: Parser<T?, Character>, input: String, expected: T?,
                       usePackratReader: Bool = false)
     where T: Equatable

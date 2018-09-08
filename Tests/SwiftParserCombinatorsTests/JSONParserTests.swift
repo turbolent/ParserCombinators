@@ -248,12 +248,24 @@ class JSONParserTests: XCTestCase {
         )
     }
 
+    func testJSONSpeed() {
+        measure {
+            for _ in 0..<10 {
+                expectSuccess(
+                    parser: JSONParsers.json,
+                    input: " [  null  , true,false  ,\"test\", [{}, { }, { \" \"  : \"23\" ,\"\": 42.23}]] "
+                )
+            }
+        }
+    }
+
     static var allTests = [
         ("testUnicode", testUnicode),
         ("testCharSeqUnicode", testCharSeqUnicode),
         ("testCharSeqUnicodeMultiple", testCharSeqUnicodeMultiple),
         ("testString", testString),
-        ("testJSON", testJSON)
+        ("testJSON", testJSON),
+        ("testJSONSpeed", testJSONSpeed)
     ]
 }
 
