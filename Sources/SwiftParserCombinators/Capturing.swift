@@ -11,6 +11,10 @@ public struct Captures {
         self.entries = entries
     }
 
+    public init() {
+        self.init(values: [], entries: [:])
+    }
+
     public init(value: Any) {
         self.init(values: [value], entries: [:])
     }
@@ -44,7 +48,7 @@ extension Parser where T == Captures {
 extension Captures: AnySequenceable {
 
     public static var empty: Captures {
-        return Captures(values: [], entries: [:])
+        return Captures()
     }
 
     public func sequence(other: Captures) -> Captures {
