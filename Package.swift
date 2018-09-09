@@ -1,15 +1,26 @@
-// swift-tools-version:3.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version:4.2
 
 import PackageDescription
 
 let package = Package(
     name: "SwiftParserCombinators",
-    targets: [
-        Target(name: "SwiftParserCombinators")
+    products: [
+        .library(
+            name: "SwiftParserCombinators",
+            targets: ["SwiftParserCombinators"]
+        )
     ],
     dependencies: [
-        .Package(url: "https://github.com/turbolent/Trampoline.git",
-                 majorVersion: 0)
+        .package(url: "https://github.com/turbolent/Trampoline.git", .exact("0.1.0"))
+    ],
+    targets: [
+        .target(
+            name: "SwiftParserCombinators",
+            dependencies: ["Trampoline"]
+        ),
+        .testTarget(
+            name: "SwiftParserCombinatorsTests",
+            dependencies: ["SwiftParserCombinators"]
+        )
     ]
 )

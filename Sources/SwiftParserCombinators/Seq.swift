@@ -1,7 +1,7 @@
 
 extension Parser {
 
-    private func seq<U, V>(next: Lazy<Parser<U, Element>>, f: @escaping (T, U) -> V) -> Parser<V, Element> {
+    private func seq<U, V>(_ next: Lazy<Parser<U, Element>>, f: @escaping (T, U) -> V) -> Parser<V, Element> {
         return flatMap { firstResult in
             next.value.map { secondResult in
                 f(firstResult, secondResult)
@@ -20,7 +20,7 @@ extension Parser {
     public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<(T, U), Element>
     {
-        return seq(next: Lazy(next)) { ($0, $1) }
+        return seq(Lazy(next)) { ($0, $1) }
     }
 
     /// Creates a new parser that applies this parser and the next parser in sequence, and returns
@@ -35,7 +35,7 @@ extension Parser {
         -> Parser<U, Element>
         where U.Element == T
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             U.empty
                 .sequence(next: $0)
                 .sequence(next: $1)
@@ -54,7 +54,7 @@ extension Parser {
         -> Parser<U, Element>
         where U.Element == T
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             // NOTE: order
             $1.sequence(previous: $0)
         }
@@ -71,7 +71,7 @@ extension Parser {
     public func seq<U: AnySequenceable>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<U, Element>
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             // NOTE: order
             $1.sequence(previous: $0)
         }
@@ -105,7 +105,7 @@ extension Parser {
     public func seqIgnoreRight<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<T, Element>
     {
-        return seq(next: Lazy(next)) { (left, _) in left }
+        return seq(Lazy(next)) { (left, _) in left }
     }
 }
 
@@ -122,7 +122,7 @@ extension Parser where T: Sequenceable {
     public func seq(_ next: @autoclosure @escaping () -> Parser<T, Element>)
         -> Parser<T, Element>
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             $0.sequence(other: $1)
         }
     }
@@ -139,7 +139,7 @@ extension Parser where T: Sequenceable {
         -> Parser<T, Element>
         where T.Element == U
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             $0.sequence(next: $1)
         }
     }
@@ -158,7 +158,7 @@ extension Parser where T: AnySequenceable {
     public func seq(_ next: @autoclosure @escaping () -> Parser<T, Element>)
         -> Parser<T, Element>
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             $0.sequence(other: $1)
         }
     }
@@ -174,7 +174,7 @@ extension Parser where T: AnySequenceable {
     public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<T, Element>
     {
-        return seq(next: Lazy(next)) {
+        return seq(Lazy(next)) {
             $0.sequence(next: $1)
         }
     }
