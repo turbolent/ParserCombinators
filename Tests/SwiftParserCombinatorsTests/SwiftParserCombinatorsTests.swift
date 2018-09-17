@@ -737,6 +737,11 @@ class SwiftParserCombinatorsTests: XCTestCase {
                       input: "")
     }
 
+    func testSeqUnit() {
+        let _: Parser<SwiftParserCombinators.Unit, Character> =
+            char("y").map(Unit.empty) ~ char("z").map(Unit.empty)
+    }
+
     static var allTests = [
         ("testAccept", testAccept),
         ("testLiteral", testLiteral),

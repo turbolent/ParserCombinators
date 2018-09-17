@@ -16,21 +16,21 @@ public struct Unit {
 }
 
 
-extension Unit: Sequenceable {
-    public typealias Element = Unit
+extension Unit: AnySequenceable {
 
     public func sequence(other: Unit) -> Unit {
         return .empty
     }
 
-    public func sequence(previous: Unit) -> Unit {
+    public func sequence(previous: Any) -> Unit {
         return .empty
     }
 
-    public func sequence(next: Unit) -> Unit {
+    public func sequence(next: Any) -> Unit {
         return .empty
     }
 }
+
 
 extension Array: Sequenceable {
 

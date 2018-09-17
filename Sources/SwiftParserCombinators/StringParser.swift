@@ -188,5 +188,10 @@ public func withWhitespace<T>(_ parser: Parser<T, Character>) -> Parser<T, Chara
     return (whitespace ~> parser) <~ whitespace
 }
 
+private let whitespaceCharacterSet: CharacterSet = [" ", "\t", "\r", "\n"]
+
+public let whitespaceCharacter: Parser<Character, Character> =
+    `in`(whitespaceCharacterSet, kind: "whitespace")
+
 public let whitespace: Parser<Unit, Character> =
-    (`in`([" ", "\t", "\r", "\n"], kind: "whitespace") ^^^ Unit.empty).rep()
+    (whitespaceCharacter ^^^ Unit.empty).rep()

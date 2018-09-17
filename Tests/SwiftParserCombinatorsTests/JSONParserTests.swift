@@ -92,7 +92,7 @@ class JSONParsers {
     static func structureChar(_ character: Character) -> VoidParser {
         return withWhitespace(char(character)) ^^^ ()
     }
-    
+
     static let hexDigit = `in`(hexDigits, kind: "hex-digit")
 
     static let unicodeBlock: Parser<[Character], Character> = hexDigit.rep(n: 4)
