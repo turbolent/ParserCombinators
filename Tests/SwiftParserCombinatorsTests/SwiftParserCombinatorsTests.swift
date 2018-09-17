@@ -742,6 +742,11 @@ class SwiftParserCombinatorsTests: XCTestCase {
             char("y").map(Unit.empty) ~ char("z").map(Unit.empty)
     }
 
+    func testSeqTuple() {
+        let _: Parser<([Character], [Character]), Character> =
+            char("y").rep() ~~ char("z").rep()
+    }
+
     static var allTests = [
         ("testAccept", testAccept),
         ("testLiteral", testLiteral),
@@ -776,6 +781,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
         ("testChainLeft", testChainLeft),
         ("testLeftRecursion", testLeftRecursion),
         ("testCapturing", testCapturing),
-        ("testSkipUntil", testSkipUntil)
+        ("testSkipUntil", testSkipUntil),
+        ("testSeqUnit", testSeqUnit),
+        ("testSeqTuple", testSeqTuple)
     ]
 }

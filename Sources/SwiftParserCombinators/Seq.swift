@@ -20,6 +20,20 @@ extension Parser {
     public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<(T, U), Element>
     {
+        return seqTuple(next)
+    }
+
+    // Creates a new parser that applies this parser and the next parser in sequence, and returns
+    /// the results of both in a tuple. The next parser is applied to the input left over by this parser.
+    /// The new parser succeeds if (and only if) both parsers succeed.
+    ///
+    /// - Note: The next parser is only applied if this parser succeeds.
+    ///
+    /// - Parameter next: The parser to be applied after this parser suceeded.
+    ///
+    public func seqTuple<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+        -> Parser<(T, U), Element>
+    {
         return seq(Lazy(next)) { ($0, $1) }
     }
 
@@ -182,6 +196,7 @@ extension Parser where T: AnySequenceable {
 
 
 infix operator ~: ApplicativePrecedence
+infix operator ~~: ApplicativePrecedence
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
 /// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
@@ -198,6 +213,23 @@ public func ~ <T, U, Element>(first: Parser<T, Element>,
     -> Parser<(T, U), Element>
 {
     return first.seq(second)
+}
+
+// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, Element>(first: Parser<T, Element>,
+                               second: @autoclosure @escaping () -> Parser<U, Element>)
+    -> Parser<(T, U), Element>
+{
+    return first.seqTuple(second)
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
@@ -338,7 +370,24 @@ public func ~ <T, U, V, Element>(first: Parser<(T, U), Element>,
                                  second: @autoclosure @escaping () -> Parser<V, Element>)
     -> Parser<(T, U, V), Element>
 {
-    return first.seq(second).map { ($0.0.0, $0.0.1, $0.1) }
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.1) }
+}
+
+/// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, V, Element>(first: Parser<(T, U), Element>,
+                                  second: @autoclosure @escaping () -> Parser<V, Element>)
+    -> Parser<(T, U, V), Element>
+{
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.1) }
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
@@ -355,7 +404,24 @@ public func ~ <T, U, V, W, Element>(first: Parser<(T, U, V), Element>,
                                     second: @autoclosure @escaping () -> Parser<W, Element>)
     -> Parser<(T, U, V, W), Element>
 {
-    return first.seq(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
+}
+
+/// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, V, W, Element>(first: Parser<(T, U, V), Element>,
+                                     second: @autoclosure @escaping () -> Parser<W, Element>)
+    -> Parser<(T, U, V, W), Element>
+{
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.1) }
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
@@ -372,7 +438,24 @@ public func ~ <T, U, V, W, X, Element>(first: Parser<(T, U, V, W), Element>,
                                        second: @autoclosure @escaping () -> Parser<X, Element>)
     -> Parser<(T, U, V, W, X), Element>
 {
-    return first.seq(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
+}
+
+/// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, V, W, X, Element>(first: Parser<(T, U, V, W), Element>,
+                                        second: @autoclosure @escaping () -> Parser<X, Element>)
+    -> Parser<(T, U, V, W, X), Element>
+{
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1) }
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
@@ -389,7 +472,24 @@ public func ~ <T, U, V, W, X, Y, Element>(first: Parser<(T, U, V, W, X), Element
                                           second: @autoclosure @escaping () -> Parser<Y, Element>)
     -> Parser<(T, U, V, W, X, Y), Element>
 {
-    return first.seq(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1) }
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1) }
+}
+
+/// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, V, W, X, Y, Element>(first: Parser<(T, U, V, W, X), Element>,
+                                           second: @autoclosure @escaping () -> Parser<Y, Element>)
+    -> Parser<(T, U, V, W, X, Y), Element>
+{
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1) }
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence, and returns
@@ -406,7 +506,24 @@ public func ~ <T, U, V, W, X, Y, Z, Element>(first: Parser<(T, U, V, W, X, Y), E
                                              second: @autoclosure @escaping () -> Parser<Z, Element>)
     -> Parser<(T, U, V, W, X, Y, Z), Element>
 {
-    return first.seq(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1) }
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1) }
+}
+
+/// Creates a new parser that applies the first parser and the second parser in sequence, and returns
+/// the results of both in a tuple. The second parser is applied to the input left over by the first parser.
+/// The new parser succeeds if (and only if) both parsers succeed.
+///
+/// - Note: The second parser is only applied if the first parser succeeds.
+///
+/// - Parameters:
+///   - first: The parser to be applied first.
+///   - second: The parser to be applied after the first parser suceeded.
+///
+public func ~~ <T, U, V, W, X, Y, Z, Element>(first: Parser<(T, U, V, W, X, Y), Element>,
+                                              second: @autoclosure @escaping () -> Parser<Z, Element>)
+    -> Parser<(T, U, V, W, X, Y, Z), Element>
+{
+    return first.seqTuple(second).map { ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1) }
 }
 
 // NOTE: actual defintition would be, but already defined in the standard definition as a workaround,
