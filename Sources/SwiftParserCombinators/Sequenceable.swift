@@ -10,7 +10,7 @@ public protocol Sequenceable {
 }
 
 
-public struct Unit {
+public struct Unit: Equatable {
     public static let empty = Unit()
     private init() {}
 }
