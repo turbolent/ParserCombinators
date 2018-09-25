@@ -16,13 +16,11 @@ extension Parser {
     ///   - max: The maximum number of times this parser is to be applied.
     ///
     public func chainLeft(_ separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
-                          empty: T,
                           min: Int = 0, max: Int? = nil)
-        -> Parser<T, Element>
+        -> Parser<T?, Element>
     {
         return SwiftParserCombinators.chainLeft(self,
                                                 separator: separator,
-                                                empty: empty,
                                                 min: min,
                                                 max: max)
     }
@@ -43,17 +41,16 @@ extension Parser {
 ///
 public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
                                   separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
-                                  empty: T,
                                   min: Int = 0,
                                   max: Int? = nil)
-    -> Parser<T, Element>
+    -> Parser<T?, Element>
 {
     typealias Op = (T, T) -> T
 
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let repeatingParser =
+    let repeatingParser: Parser<T?, Element> =
         lazyParser.value.seq(lazySeparator.value.seq(lazyParser.value).rep(min: min, max: max))
             ^^ { (firstAndRest: (T, [(Op, T)])) -> T in
                 let (first, rest) = firstAndRest
@@ -67,5 +64,5 @@ public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<
         return repeatingParser
     }
 
-    return repeatingParser || success(empty)
+    return repeatingParser || success(nil)
 }
