@@ -50,8 +50,13 @@ public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let repeatingParser: Parser<T?, Element> =
-        lazyParser.value.seq(lazySeparator.value.seq(lazyParser.value).rep(min: min, max: max))
+    let rest: Parser<[(Op, T)], Element> = lazySeparator.value
+        .seq(lazyParser.value)
+        .rep(min: Swift.max(0, min - 1),
+             max: max.map { $0 - 1})
+
+    let all: Parser<T?, Element> =
+        lazyParser.value.seq(rest)
             ^^ { (firstAndRest: (T, [(Op, T)])) -> T in
                 let (first, rest) = firstAndRest
                 return rest.reduce(first) { result, opAndValue -> T in
@@ -61,8 +66,8 @@ public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<
             }
 
     if min > 0 {
-        return repeatingParser
+        return all
     }
 
-    return repeatingParser || success(nil)
+    return all || success(nil)
 }
