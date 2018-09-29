@@ -44,8 +44,8 @@ let expr: Parser<Int, Character> =
     Parser.recursive { expr in
         let factor = (char("(") ~> expr) <~ char(")")
             || num
-        let term = factor.chainLeft(mulOp, empty: 0)
-        return term.chainLeft(addOp, empty: 0)
+        let term = factor.chainLeft(mulOp, min: 1).map { $0 ?? 0 }
+        return term.chainLeft(addOp, min: 1).map { $0 ?? 0 }
     }
 
 let r = CollectionReader(collection: "(23+42)*3")
