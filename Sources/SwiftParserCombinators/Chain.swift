@@ -15,8 +15,10 @@ extension Parser {
     ///          and so backtracking is allowed.
     ///   - max: The maximum number of times this parser is to be applied.
     ///
-    public func chainLeft(_ separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
-                          min: Int = 0, max: Int? = nil)
+    public func chainLeft(
+        separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
+        min: Int = 0, max: Int? = nil
+    )
         -> Parser<T?, Element>
     {
         return SwiftParserCombinators.chainLeft(self,
@@ -39,10 +41,12 @@ extension Parser {
 ///          and so backtracking is allowed.
 ///   - max: The maximum number of times the given parser is to be applied.
 ///
-public func chainLeft<T, Element>(_ parser: @autoclosure @escaping () -> Parser<T, Element>,
-                                  separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
-                                  min: Int = 0,
-                                  max: Int? = nil)
+public func chainLeft<T, Element>(
+    _ parser: @autoclosure @escaping () -> Parser<T, Element>,
+    separator: @autoclosure @escaping () -> Parser<(T, T) -> T, Element>,
+    min: Int = 0,
+    max: Int? = nil
+)
     -> Parser<T?, Element>
 {
     typealias Op = (T, T) -> T
