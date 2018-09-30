@@ -746,4 +746,14 @@ class SwiftParserCombinatorsTests: XCTestCase {
         let _: Parser<([Character], [Character]), Character> =
             char("y").rep() ~~ char("z").rep()
     }
+
+    func testEndOfInput() {
+        let p: Parser<SwiftParserCombinators.Unit, Character> = endOfInput()
+
+        expectSuccess(parser: p,
+                      input: "",
+                      expected: .empty)
+        expectFailure(parser: p,
+                      input: "x")
+    }
 }
