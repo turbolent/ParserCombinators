@@ -626,8 +626,8 @@ class SwiftParserCombinatorsTests: XCTestCase {
             Parser.recursive { expr in
                 let value = num
                     || (char("(") ~> expr) <~ char(")")
-                let prod = value.chainLeft(mulOp, min: 1).map { $0 ?? 0 }
-                return prod.chainLeft(addOp, min: 1).map { $0 ?? 0 }
+                let prod = value.chainLeft(separator: mulOp, min: 1).map { $0 ?? 0 }
+                return prod.chainLeft(separator: addOp, min: 1).map { $0 ?? 0 }
         }
 
         expectSuccess(parser: expr,
