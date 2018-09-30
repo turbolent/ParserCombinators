@@ -746,43 +746,4 @@ class SwiftParserCombinatorsTests: XCTestCase {
         let _: Parser<([Character], [Character]), Character> =
             char("y").rep() ~~ char("z").rep()
     }
-
-    static var allTests = [
-        ("testAccept", testAccept),
-        ("testLiteral", testLiteral),
-        ("testMap", testMap),
-        ("testMapValue", testMapValue),
-        ("testSeq", testSeq),
-        ("testSeq3", testSeq3),
-        ("testSeq4", testSeq4),
-        ("testSeq5", testSeq5),
-        ("testSeqIgnoreLeft", testSeqIgnoreLeft),
-        ("testSeqIgnoreRight", testSeqIgnoreRight),
-        ("testOr", testOr),
-        ("testCommitOr", testCommitOr),
-        ("testOrFirstSuccess", testOrFirstSuccess),
-        ("testOrLonger", testOrLonger),
-        ("testCommitOrLonger", testCommitOrLonger),
-        ("testOpt", testOpt),
-        ("testRepNoMinNoMax", testRepNoMinNoMax),
-        ("testRepMinNoMax", testRepMinNoMax),
-        ("testRepMinMax", testRepMinMax),
-        ("testRepZeroMax", testRepZeroMax),
-        ("testRepError", testRepError),
-        ("testRepSepNoMinNoMax", testRepSepNoMinNoMax),
-        ("testRepSepMinNoMax", testRepSepMinNoMax),
-        ("testRepSepMinMax", testRepSepMinMax),
-        ("testRepSepZeroMax", testRepSepZeroMax),
-        ("testTuples", testTuples),
-        ("testRecursive", testRecursive),
-        ("testRecursive2", testRecursive2),
-        ("testNotFollowedBy", testNotFollowedBy),
-        ("testFollowedBy", testFollowedBy),
-        ("testChainLeft", testChainLeft),
-        ("testLeftRecursion", testLeftRecursion),
-        ("testCapturing", testCapturing),
-        ("testSkipUntil", testSkipUntil),
-        ("testSeqUnit", testSeqUnit),
-        ("testSeqTuple", testSeqTuple)
-    ]
 }

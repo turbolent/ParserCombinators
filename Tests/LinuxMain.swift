@@ -1,7 +1,8 @@
 import XCTest
-@testable import SwiftParserCombinatorsTests
 
-XCTMain([
-    testCase(SwiftParserCombinatorsTests.allTests),
-    testCase(JSONParserTests.allTests)
-])
+import SwiftParserCombinatorsTests
+
+var tests = [XCTestCaseEntry]()
+tests += SwiftParserCombinatorsTests.__allTests()
+
+XCTMain(tests)
