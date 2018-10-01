@@ -18,6 +18,7 @@ extension SwiftParserCombinatorsTests {
         ("testChainLeft", testChainLeft),
         ("testCommitOr", testCommitOr),
         ("testCommitOrLonger", testCommitOrLonger),
+        ("testEndOfInput", testEndOfInput),
         ("testFollowedBy", testFollowedBy),
         ("testLeftRecursion", testLeftRecursion),
         ("testLiteral", testLiteral),

@@ -258,15 +258,4 @@ class JSONParserTests: XCTestCase {
             }
         }
     }
-
-    static var allTests = [
-        ("testUnicode", testUnicode),
-        ("testCharSeqUnicode", testCharSeqUnicode),
-        ("testCharSeqUnicodeMultiple", testCharSeqUnicodeMultiple),
-        ("testString", testString),
-        ("testJSON", testJSON),
-        ("testJSONSpeed", testJSONSpeed)
-    ]
 }
-
-
