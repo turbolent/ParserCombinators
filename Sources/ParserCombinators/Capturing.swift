@@ -20,14 +20,14 @@ public struct Captures {
     }
 
     fileprivate func with(name: String, values: Values) -> Captures {
-        var next = self
-        if next.entries[name] != nil {
-            next.entries[name]?.append(values)
+        var result = self
+        if result.entries[name] != nil {
+            result.entries[name]?.append(values)
         } else {
             let entries = [values]
-            next.entries[name] = entries
+            result.entries[name] = entries
         }
-        return next
+        return result
     }
 }
 
@@ -66,22 +66,14 @@ extension Captures: AnySequenceable {
     }
 
     public func sequence(previous: Any) -> Captures {
-        if let other = previous as? Captures {
-            return sequence(other: other)
-        } else {
-            var values = [previous]
-            values.append(contentsOf: self.values)
-            return Captures(values: values, entries: entries)
-        }
+        var values = [previous]
+        values.append(contentsOf: self.values)
+        return Captures(values: values, entries: entries)
     }
 
     public func sequence(next: Any) -> Captures {
-        if let other = next as? Captures {
-            return sequence(other: other)
-        } else {
-            var values = self.values
-            values.append(next)
-            return Captures(values: values, entries: entries)
-        }
+        var values = self.values
+        values.append(next)
+        return Captures(values: values, entries: entries)
     }
 }
