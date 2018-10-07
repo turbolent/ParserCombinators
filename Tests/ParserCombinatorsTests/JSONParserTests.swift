@@ -1,7 +1,6 @@
 
 import XCTest
-import SwiftParserCombinators
-
+import ParserCombinators
 
 
 indirect enum JSON {

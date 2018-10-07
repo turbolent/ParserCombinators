@@ -1,8 +1,8 @@
 import XCTest
 
-import SwiftParserCombinatorsTests
+import ParserCombinatorsTests
 
 var tests = [XCTestCaseEntry]()
-tests += SwiftParserCombinatorsTests.__allTests()
+tests += ParserCombinatorsTests.__allTests()
 
 XCTMain(tests)

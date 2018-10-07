@@ -1,8 +1,8 @@
 import XCTest
-import SwiftParserCombinators
+import ParserCombinators
 
 
-class SwiftParserCombinatorsTests: XCTestCase {
+class ParserCombinatorsTests: XCTestCase {
 
     func testAccept() {
         let parser = char("a")
@@ -738,7 +738,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testSeqUnit() {
-        let _: Parser<SwiftParserCombinators.Unit, Character> =
+        let _: Parser<ParserCombinators.Unit, Character> =
             char("y").map(Unit.empty) ~ char("z").map(Unit.empty)
     }
 
@@ -748,7 +748,7 @@ class SwiftParserCombinatorsTests: XCTestCase {
     }
 
     func testEndOfInput() {
-        let p: Parser<SwiftParserCombinators.Unit, Character> = endOfInput()
+        let p: Parser<ParserCombinators.Unit, Character> = endOfInput()
 
         expectSuccess(parser: p,
                       input: "",

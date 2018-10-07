@@ -11,7 +11,7 @@ extension JSONParserTests {
     ]
 }
 
-extension SwiftParserCombinatorsTests {
+extension ParserCombinatorsTests {
     static let __allTests = [
         ("testAccept", testAccept),
         ("testCapturing", testCapturing),
@@ -57,7 +57,7 @@ extension SwiftParserCombinatorsTests {
 public func __allTests() -> [XCTestCaseEntry] {
     return [
         testCase(JSONParserTests.__allTests),
-        testCase(SwiftParserCombinatorsTests.__allTests),
+        testCase(ParserCombinatorsTests.__allTests),
     ]
 }
 #endif

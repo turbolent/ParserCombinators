@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/turbolent/SwiftParserCombinators.svg?branch=master)](https://travis-ci.org/turbolent/SwiftParserCombinators)
+[![Build Status](https://travis-ci.org/turbolent/ParserCombinators.svg?branch=master)](https://travis-ci.org/turbolent/ParserCombinators)
 
-# SwiftParserCombinators
+# ParserCombinators
 
 A *parser-combinator* library for Swift. 
 
@@ -24,7 +24,7 @@ For example, a simple calculator with the grammar in BNF can be implemented as f
 
 ```swift
 
-import SwiftParserCombinators
+import ParserCombinators
 
 typealias Op = (Int, Int) -> Int
 typealias OpParser = Parser<Op, Character>

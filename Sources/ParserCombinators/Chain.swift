@@ -21,10 +21,10 @@ extension Parser {
     )
         -> Parser<T?, Element>
     {
-        return SwiftParserCombinators.chainLeft(self,
-                                                separator: separator,
-                                                min: min,
-                                                max: max)
+        return ParserCombinators.chainLeft(self,
+                                           separator: separator,
+                                           min: min,
+                                           max: max)
     }
 }
 

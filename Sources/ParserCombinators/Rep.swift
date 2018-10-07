@@ -17,7 +17,7 @@ extension Parser {
     public func rep<U: Sequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
         where U.Element == T
     {
-        return SwiftParserCombinators.rep(self, min: min, max: max)
+        return ParserCombinators.rep(self, min: min, max: max)
     }
 
     /// Creates a new parser that repeatedly applies this parser until it fails,
@@ -31,7 +31,7 @@ extension Parser {
     ///   - max: The maximum number of times this parser is to be applied.
     ///
     public func rep<U: AnySequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element> {
-        return SwiftParserCombinators.rep(self, min: min, max: max)
+        return ParserCombinators.rep(self, min: min, max: max)
     }
 
     /// Creates a new parser that repeatedly applies this parser the given number of times,
@@ -45,7 +45,7 @@ extension Parser {
     public func rep<U: Sequenceable>(n: Int) -> Parser<U, Element>
         where U.Element == T
     {
-        return SwiftParserCombinators.rep(self, min: n, max: n)
+        return ParserCombinators.rep(self, min: n, max: n)
     }
 
     /// Creates a new parser that repeatedly applies this parser the given number of times,
@@ -57,7 +57,7 @@ extension Parser {
     ///                is allowed.
     ///
     public func rep<U: AnySequenceable>(n: Int) -> Parser<U, Element> {
-        return SwiftParserCombinators.rep(self, min: n, max: n)
+        return ParserCombinators.rep(self, min: n, max: n)
     }
 
     /// Creates a new parser that repeatedly applies this parser interleaved with
@@ -78,7 +78,7 @@ extension Parser {
         -> Parser<V, Element>
         where V.Element == T
     {
-        return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
+        return ParserCombinators.rep(self, separator: separator, min: min, max: max)
     }
 
     /// Creates a new parser that repeatedly applies this parser interleaved with
@@ -98,7 +98,7 @@ extension Parser {
     )
         -> Parser<V, Element>
     {
-        return SwiftParserCombinators.rep(self, separator: separator, min: min, max: max)
+        return ParserCombinators.rep(self, separator: separator, min: min, max: max)
     }
 }
 

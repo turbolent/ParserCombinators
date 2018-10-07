@@ -3,11 +3,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftParserCombinators",
+    name: "ParserCombinators",
     products: [
         .library(
-            name: "SwiftParserCombinators",
-            targets: ["SwiftParserCombinators"]
+            name: "ParserCombinators",
+            targets: ["ParserCombinators"]
         )
     ],
     dependencies: [
@@ -15,12 +15,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SwiftParserCombinators",
+            name: "ParserCombinators",
             dependencies: ["Trampoline"]
         ),
         .testTarget(
-            name: "SwiftParserCombinatorsTests",
-            dependencies: ["SwiftParserCombinators"]
+            name: "ParserCombinatorsTests",
+            dependencies: ["ParserCombinators"]
         )
     ]
 )

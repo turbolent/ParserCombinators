@@ -4,7 +4,7 @@ extension Parser {
     /// Creates a new parser that optionally parses what this parser parses.
     /// The new parser always succeeds. If this parser fails, the new parser returns `nil`.
     public func opt() -> Parser<T?, Element> {
-        return SwiftParserCombinators.opt(self)
+        return ParserCombinators.opt(self)
     }
 }
 

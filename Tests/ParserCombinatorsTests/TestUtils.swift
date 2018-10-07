@@ -1,6 +1,6 @@
 
 import XCTest
-import SwiftParserCombinators
+import ParserCombinators
 
 private func parse<T>(parser: Parser<T, Character>, input: String,
                       usePackratReader: Bool = false)
