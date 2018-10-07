@@ -22,32 +22,28 @@ extension Parser {
                     return Done(result.map { .left($0) })
 
                 case let .error(message, remaining):
-                    // NOTE: unfortunately Swift doesn't have a bottom type, so can't use `result` here.
                     return Done(.error(message: message, remaining: remaining))
 
                 case let .failure(message, remaining):
-                    return More { lazyAlternative.value.step(input) }.map { altResult in
-                        switch altResult {
-                        case .success:
-                            return altResult.map { .right($0) }
+                    return More { lazyAlternative.value.step(input) }
+                        .map { altResult in
+                            switch altResult {
+                            case .success:
+                                return altResult.map { .right($0) }
 
-                        case .failure(_, let altRemaining):
-                            if altRemaining.offset < remaining.offset {
-                                // NOTE: unfortunately Swift doesn't have a bottom type,
-                                // so can't use `result` here
-                                return .failure(message: message, remaining: remaining)
-                            }
-                            return altResult.map { .right($0) }
+                            case let .failure(altMessage, altRemaining):
+                                if altRemaining.offset < remaining.offset {
+                                    return .failure(message: message, remaining: remaining)
+                                }
+                                return .failure(message: altMessage, remaining: altRemaining)
 
-                        case .error(_, let altRemaining):
-                            if altRemaining.offset < remaining.offset {
-                                // NOTE: unfortunately Swift doesn't have a bottom type,
-                                // so can't use `result` here
-                                return .error(message: message, remaining: remaining)
+                            case let .error(altMessage, altRemaining):
+                                if altRemaining.offset < remaining.offset {
+                                    return .error(message: message, remaining: remaining)
+                                }
+                                return .error(message: altMessage, remaining: altRemaining)
                             }
-                            return altResult.map { .right($0) }
                         }
-                    }
                 }
             }
         }
@@ -84,39 +80,45 @@ extension Parser {
             self.step(input).flatMap { result in
                 switch result {
                 case .success(_, let remaining):
-                    return More { lazyAlternative.value.step(input) }.map { altResult in
-                        switch altResult {
-                        case .success(_, let altRemaining):
-                            if altRemaining.offset < remaining.offset {
+                    return More { lazyAlternative.value.step(input) }
+                        .map { altResult in
+                            switch altResult {
+                            case .success(_, let altRemaining):
+                                if altRemaining.offset < remaining.offset {
+                                    return result.map { .left($0) }
+                                }
+                                return altResult.map { .right($0) }
+
+                            case .failure, .error:
                                 return result.map { .left($0) }
                             }
-                            return altResult.map { .right($0) }
-
-                        case .failure, .error:
-                            return result.map { .left($0) }
                         }
-                    }
 
                 case let .error(message, remaining):
                     return Done(.error(message: message, remaining: remaining))
 
                 case let .failure(message, remaining):
-                    return More { lazyAlternative.value.step(input) }.map { altResult in
-                        switch altResult {
-                        case .success:
-                            return altResult.map { .right($0) }
+                    return More { lazyAlternative.value.step(input) }
+                        .map { altResult in
+                            switch altResult {
+                            case .success:
+                                return altResult.map { .right($0) }
 
-                        // NOTE: unfortunately matching a generic value in multiple patterns
-                        // is not yet supported, so can't bind `remaining` here
-                        case .failure, .error:
-                            if altResult.remaining.offset < remaining.offset {
-                                // NOTE: unfortunately Swift doesn't have a bottom type,
-                                // so can't use `result` here.
-                                return .failure(message: message, remaining: remaining)
+                            // NOTE: unfortunately matching a generic value in multiple patterns
+                            // is not yet supported, so can't bind `remaining` here
+                            case let .failure(altMessage, altRemaining):
+                                if altRemaining.offset < remaining.offset {
+                                    return .failure(message: message, remaining: remaining)
+                                }
+                                return .failure(message: altMessage, remaining: altRemaining)
+
+                            case let .error(altMessage, altRemaining):
+                                if altRemaining.offset < remaining.offset {
+                                    return .failure(message: message, remaining: remaining)
+                                }
+                                return .error(message: altMessage, remaining: altRemaining)
                             }
-                            return altResult.map { .right($0) }
                         }
-                    }
                 }
             }
         }

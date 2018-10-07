@@ -18,6 +18,20 @@ class ParserCombinatorsTests: XCTestCase {
                       input: " a")
     }
 
+    func testFilter() {
+        let parser = accept().filter { $0 == Character("a") }
+
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: Character("a"))
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "b")
+        expectFailure(parser: parser,
+                      input: " a")
+    }
+
     func testLiteral() {
         let parser = literal("test")
 
@@ -203,6 +217,30 @@ class ParserCombinatorsTests: XCTestCase {
                       expected: "a")
     }
 
+    func testOrFailure() {
+        let parser =
+            ((char("a") ~ char("a")).stringParser || (char("b") ^^ String.init))
+
+        expectFailure(parser: parser,
+                      input: "ac")
+    }
+
+    func testOrErrorFirst() {
+        let parser =
+            ((char("a") ~ char("a")).stringParser || (commit(char("b")) ^^ String.init))
+
+        expectError(parser: parser,
+                    input: "ac")
+    }
+
+    func testOrErrorSecond() {
+        let parser =
+            ((char("a") ~ char("a")).stringParser || (char("b") ~ commit(char("b"))).stringParser)
+
+        expectError(parser: parser,
+                    input: "bc")
+    }
+
     func testCommitOr() {
         let parser =
             ((char("a") ~ commit(char("b")))
@@ -237,13 +275,34 @@ class ParserCombinatorsTests: XCTestCase {
                       expected: "a")
     }
 
-    func testOrLonger() {
+    func testOrLongerDifferent() {
         let parser =
-            (char("a") ^^ String.init)
-                ||| ((char("a") ~ char("b")).stringParser)
+            ((char("a") ~ char("b")).stringParser)
+                ||| (char("b") ^^ String.init)
 
         expectFailure(parser: parser,
                       input: "")
+        expectFailure(parser: parser,
+                      input: "c")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectSuccess(parser: parser,
+                      input: "b",
+                      expected: "b")
+        expectFailure(parser: parser,
+                      input: "ac")
+    }
+
+    func testOrLongerSameFirst() {
+        let parser =
+            ((char("a") ~ char("b")).stringParser)
+                ||| (char("a") ^^ String.init)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "c")
         expectSuccess(parser: parser,
                       input: "a",
                       expected: "a")
@@ -255,7 +314,27 @@ class ParserCombinatorsTests: XCTestCase {
                       expected: "ab")
     }
 
-    func testCommitOrLonger() {
+    func testOrLongerSameSecond() {
+        let parser =
+            (char("a") ^^ String.init)
+                ||| ((char("a") ~ char("b")).stringParser)
+
+        expectFailure(parser: parser,
+                      input: "")
+        expectFailure(parser: parser,
+                      input: "c")
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: "ab")
+        expectSuccess(parser: parser,
+                      input: "abc",
+                      expected: "ab")
+    }
+
+    func testCommitOrLongerSame() {
         let parser =
             (commit(char("a")) ^^ String.init)
                 ||| ((char("a") ~ char("b")).stringParser)
@@ -273,6 +352,27 @@ class ParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: parser,
                       input: "abc",
                       expected: "ab")
+    }
+
+    func testCommitOrLongerDifferent() {
+        let parser =
+            ((char("b") ~ char("c")).stringParser)
+                ||| (commit(char("a")) ^^ String.init)
+
+
+        expectError(parser: parser,
+                    input: "")
+        expectError(parser: parser,
+                    input: "b")
+        expectSuccess(parser: parser,
+                      input: "a",
+                      expected: "a")
+        expectSuccess(parser: parser,
+                      input: "bc",
+                      expected: "bc")
+        expectFailure(parser: parser,
+                      input: "ba")
+
     }
 
     func testOpt() {
@@ -703,12 +803,31 @@ class ParserCombinatorsTests: XCTestCase {
                        String(describing: [42, 23, true, "d", "e"]))
         XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
                        String(describing: [
-                         (key: "1", value: [[42], [true]]),
-                         (key: "2", value: [[23, true, "d"]]),
-                         (key: "3", value: [["e"]]),
-                         (key: "4", value: [[42, 23, true, "d", "e"]])
+                           (key: "1", value: [[42], [true]]),
+                           (key: "2", value: [[23, true, "d"]]),
+                           (key: "3", value: [["e"]]),
+                           (key: "4", value: [[42, 23, true, "d", "e"]])
                        ]))
+    }
 
+    func testCapturing2() {
+        let p: Parser<Captures, Character> =
+            char("a").capture("a") ~ char("b").capture("b")
+
+        guard case .success(let captures, _) =
+            p.parse(CollectionReader(collection: "ab"))
+        else {
+            XCTFail("should have parsed")
+            return
+        }
+
+        XCTAssertEqual(String(describing: captures.values),
+                       String(describing: ["a", "b"]))
+        XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
+                       String(describing: [
+                           (key: "a", value: [["a"]]),
+                           (key: "b", value: [["b"]]),
+                       ]))
     }
 
     func testSkipUntil() {
