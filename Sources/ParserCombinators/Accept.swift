@@ -19,8 +19,17 @@ public func accept<Element>() -> Parser<Element, Element> {
 
 extension Parser {
 
+    /// Creates a parser that succeeds if the given parser succeeds and the result value
+    /// satisfies the given predicate. Returns the result value.
+    ///
+    /// - Parameters:
+    ///   - predicate: A function that determines if the result value matches.
+    ///   - errorMessageSupplier: A function which is used to generate the error message for an invalid value.
+    ///   - value: The result value to be tested.
+    ///   - invalidValue: The result value which did not satisfy the predicate.
+    ///
     public func filter(
-        errorMessageSupplier: ((_ invalidElement: T) -> String)? = nil,
+        errorMessageSupplier: ((_ invalidValue: T) -> String)? = nil,
         _ predicate: @escaping (_ value: T) -> Bool
     )
         -> Parser<T, Element>
@@ -38,11 +47,11 @@ extension Parser {
     }
 }
 
-/// Create a parser that accepts a single input element that satisfies a given predicate,
+/// Create a parser that accepts a single input element that satisfies the given predicate,
 /// and returns the parsed element.
 ///
 /// - Parameters:
-///   - predicate: A function that determines if an input element matches.
+///   - predicate: A function that determines if the input element matches.
 ///   - errorMessageSupplier: A function which is used to generate the error message for an invalid element.
 ///   - element: The input element to be tested.
 ///   - invalidElement: The input element which did not satisfy the predicate.
