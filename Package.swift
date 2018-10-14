@@ -11,7 +11,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/turbolent/Trampoline.git", .exact("0.2.0"))
+        .package(url: "https://github.com/turbolent/Trampoline.git", .exact("0.2.0")),
+        .package(url: "https://github.com/turbolent/DiffedAssertEqual.git", .branch("master")),
     ],
     targets: [
         .target(
@@ -20,7 +21,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ParserCombinatorsTests",
-            dependencies: ["ParserCombinators"]
+            dependencies: ["ParserCombinators", "DiffedAssertEqual"]
         )
     ]
 )

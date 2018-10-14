@@ -1,5 +1,6 @@
 import XCTest
 import ParserCombinators
+import DiffedAssertEqual
 
 
 class ParserCombinatorsTests: XCTestCase {
@@ -799,15 +800,15 @@ class ParserCombinatorsTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(String(describing: captures.values),
-                       String(describing: [42, 23, true, "d", "e"]))
-        XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
-                       String(describing: [
-                           (key: "1", value: [[42], [true]]),
-                           (key: "2", value: [[23, true, "d"]]),
-                           (key: "3", value: [["e"]]),
-                           (key: "4", value: [[42, 23, true, "d", "e"]])
-                       ]))
+        diffedAssertEqual(String(describing: captures.values),
+                          String(describing: [42, 23, true, "d", "e"]))
+        diffedAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
+                          String(describing: [
+                              (key: "1", value: [[42], [true]]),
+                              (key: "2", value: [[23, true, "d"]]),
+                              (key: "3", value: [["e"]]),
+                              (key: "4", value: [[42, 23, true, "d", "e"]])
+                          ]))
     }
 
     func testCapturing2() {
@@ -821,13 +822,13 @@ class ParserCombinatorsTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(String(describing: captures.values),
-                       String(describing: ["a", "b"]))
-        XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
-                       String(describing: [
-                           (key: "a", value: [["a"]]),
-                           (key: "b", value: [["b"]]),
-                       ]))
+        diffedAssertEqual(String(describing: captures.values),
+                          String(describing: ["a", "b"]))
+        diffedAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
+                          String(describing: [
+                              (key: "a", value: [["a"]]),
+                              (key: "b", value: [["b"]]),
+                          ]))
     }
 
     func testSkipUntil() {
