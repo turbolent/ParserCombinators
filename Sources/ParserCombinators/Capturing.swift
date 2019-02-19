@@ -66,14 +66,24 @@ extension Captures: AnySequenceable {
     }
 
     public func sequence(previous: Any) -> Captures {
-        var values = [previous]
-        values.append(contentsOf: self.values)
-        return Captures(values: values, entries: entries)
+        // NOTE: sequencing important, otherwise entries get lost
+        if let other = previous as? Captures {
+            return sequence(other: other)
+        } else {
+            var values = [previous]
+            values.append(contentsOf: self.values)
+            return Captures(values: values, entries: entries)
+        }
     }
 
     public func sequence(next: Any) -> Captures {
-        var values = self.values
-        values.append(next)
-        return Captures(values: values, entries: entries)
+        // NOTE: sequencing important, otherwise entries get lost
+        if let other = next as? Captures {
+            return sequence(other: other)
+        } else {
+            var values = self.values
+            values.append(next)
+            return Captures(values: values, entries: entries)
+        }
     }
 }

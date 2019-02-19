@@ -831,6 +831,22 @@ class ParserCombinatorsTests: XCTestCase {
                           ]))
     }
 
+    func testCapturing3() {
+        let p: Parser<Captures, Character> = (char("a") || char("b")).capture("foo").rep(min: 1)
+
+        let reader = CollectionReader(collection: "aabx")
+
+        guard case .success(let captures, _) = p.parse(reader) else {
+            XCTFail("should have parsed")
+            return
+        }
+
+        XCTAssertEqual(String(describing: captures.values),
+                       String(describing: ["a", "a", "b"]))
+        XCTAssertEqual(String(describing: captures.entries.sorted { $0.key < $1.key }),
+                       String(describing: [(key: "foo", value: [["a"], ["a"], ["b"]])]))
+    }
+
     func testSkipUntil() {
         let p: Parser<[Character], Character> =
             skipUntil(char("y") ~ char("z"))
