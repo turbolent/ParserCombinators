@@ -23,10 +23,14 @@ extension Parser {
     /// satisfies the given predicate. Returns the result value.
     ///
     /// - Parameters:
-    ///   - predicate: A function that determines if the result value matches.
-    ///   - errorMessageSupplier: A function which is used to generate the error message for an invalid value.
-    ///   - value: The result value to be tested.
-    ///   - invalidValue: The result value which did not satisfy the predicate.
+    ///   - errorMessageSupplier:
+    ///       A function which is used to generate the error message for an invalid value.
+    ///   - invalidValue:
+    ///       The result value which did not satisfy the predicate.
+    ///   - predicate:
+    ///       A function that determines if the result value matches.
+    ///   - value:
+    ///       The result value to be tested.
     ///
     public func filter(
         errorMessageSupplier: ((_ invalidValue: T) -> String)? = nil,
@@ -51,10 +55,14 @@ extension Parser {
 /// and returns the parsed element.
 ///
 /// - Parameters:
-///   - predicate: A function that determines if the input element matches.
-///   - errorMessageSupplier: A function which is used to generate the error message for an invalid element.
-///   - element: The input element to be tested.
-///   - invalidElement: The input element which did not satisfy the predicate.
+///   - errorMessageSupplier:
+///       A function which is used to generate the error message for an invalid element.
+///   - invalidElement:
+///       The input element which did not satisfy the predicate.
+///   - predicate:
+///       A function that determines if the input element matches.
+///   - element:
+///       The input element to be tested.
 ///
 public func acceptIf<Element>(
     errorMessageSupplier: @escaping (_ invalidElement: Element) -> String,
@@ -82,7 +90,8 @@ public func elem<Element>(kind: String, predicate: @escaping (Element) -> Bool)
                     predicate)
 }
 
-/// Create a parser that accepts a single input element and returns the parsed element (i.e. `element`).
+/// Create a parser that accepts a single input element
+/// and returns the parsed element (i.e. `element`).
 ///
 /// - Parameter element: The input element to be parsed.
 ///
@@ -117,8 +126,8 @@ public func `in`(_ characters: CharacterSet, kind: String = "") -> Parser<Charac
     }
 }
 
-/// Create a parser that accepts a single character, which must not be in the set of invalid characters,
-/// and returns the parsed character.
+/// Create a parser that accepts a single character, which must not be
+/// in the set of invalid characters, and returns the parsed character.
 ///
 /// - Parameters:
 ///   - characters: The set of invalid characters.

@@ -6,8 +6,9 @@ extension Parser {
     /// Creates a new parser that succeeds if (and only if) either when this parser succeeds,
     /// or if this parser fails, when the alternative parser succeeds.
     ///
-    /// - Note: The alternative parser is only tried if this parser's failure is non-fatal,
-    ///         i.e. not an error, and so backtracking is allowed.
+    /// - Note:
+    ///     The alternative parser is only tried if this parser's failure is non-fatal,
+    ///     i.e. not an error, and so backtracking is allowed.
     ///
     /// - Parameter alternative: A parser that will be applied if this parser fails.
     ///
@@ -52,8 +53,9 @@ extension Parser {
     /// Creates a new parser that succeeds if (and only if) either when this parser succeeds,
     /// or if this parser fails, when the alternative parser succeeds.
     ///
-    /// - Note: The alternative parser is only tried if this parser's failure is non-fatal,
-    ///         i.e. not an error, and so backtracking is allowed.
+    /// - Note:
+    ///     The alternative parser is only tried if this parser's failure is non-fatal,
+    ///     i.e. not an error, and so backtracking is allowed.
     ///
     /// - Parameter alternative: A parser that will be applied if this parser fails.
     ///
@@ -67,8 +69,9 @@ extension Parser {
     /// If both parsers succeed, the result of the new parser is the result of the parser
     /// that consumed the most elements.
     ///
-    /// - Note: The alternative parser is only tried if this parser's failure is non-fatal,
-    ///         i.e. not an error, and so backtracking is allowed.
+    /// - Note:
+    ///     The alternative parser is only tried if this parser's failure is non-fatal,
+    ///     i.e. not an error, and so backtracking is allowed.
     ///
     /// - Parameter alternative: A parser that will be applied if this parser fails.
     ///
@@ -128,8 +131,9 @@ extension Parser {
     /// If both parsers succeed, the result of the new parser is the result of the parser
     /// that consumed the most elements.
     ///
-    /// - Note: The alternative parser is only tried if this parser's failure is non-fatal,
-    ///         i.e. not an error, and so backtracking is allowed.
+    /// - Note:
+    ///     The alternative parser is only tried if this parser's failure is non-fatal,
+    ///     i.e. not an error, and so backtracking is allowed.
     ///
     /// - Parameter alternative: A parser that will be applied if this parser fails.
     ///
@@ -144,8 +148,9 @@ extension Parser {
 /// Creates a new parser that succeeds if (and only if) either when the first parser succeeds,
 /// or if it fails, when the alternative parser succeeds.
 ///
-/// - Note: The alternative parser is only tried if the first parser's failure is non-fatal,
-///         i.e. not an error, and so backtracking is allowed.
+/// - Note:
+///     The alternative parser is only tried if the first parser's failure is non-fatal,
+///     i.e. not an error, and so backtracking is allowed.
 ///
 /// - Parameters:
 ///   - first: A parser that will be applied first.
@@ -161,8 +166,9 @@ public func || <T, U, Element>(first: Parser<T, Element>,
 /// Creates a new parser that succeeds if (and only if) either when the first parser succeeds,
 /// or if it fails, when the alternative parser succeeds.
 ///
-/// - Note: The alternative parser is only tried if the first parser's failure is non-fatal,
-///         i.e. not an error, and so backtracking is allowed.
+/// - Note:
+///     The alternative parser is only tried if the first parser's failure is non-fatal,
+///     i.e. not an error, and so backtracking is allowed.
 ///
 /// - Parameters:
 ///   - first: A parser that will be applied first.
@@ -182,8 +188,9 @@ infix operator ||| : LogicalDisjunctionPrecedence
 /// If both parsers succeed, the result of the new parser is the result of the parser
 /// that consumed the most elements.
 ///
-/// - Note: The alternative parser is only tried if the first parser's failure is non-fatal,
-///         i.e. not an error, and so backtracking is allowed.
+/// - Note:
+///     The alternative parser is only tried if the first parser's failure is non-fatal,
+///     i.e. not an error, and so backtracking is allowed.
 ///
 /// - Parameters:
 ///   - first: A parser that will be applied first.
@@ -200,8 +207,9 @@ public func ||| <T, U, Element>(first: Parser<T, Element>,
 /// If both parsers succeed, the result of the new parser is the result of the parser
 /// that consumed the most elements.
 ///
-/// - Note: The alternative parser is only tried if the first parser's failure is non-fatal,
-///         i.e. not an error, and so backtracking is allowed.
+/// - Note:
+///     The alternative parser is only tried if the first parser's failure is non-fatal,
+///     i.e. not an error, and so backtracking is allowed.
 ///
 /// - Parameters:
 ///   - first: A parser that will be applied first.

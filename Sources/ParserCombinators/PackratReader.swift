@@ -89,8 +89,10 @@ public class PackratParser<T, Element>: Parser<T, Element> {
                 return Done(result)
             }
 
+            let error: ParseResult<T, Element> =
+                .error(message: "left-recursion", remaining: input)
             _ = packratReader.updateCacheAndGet(parser: lazyParser.value,
-                                                result: .error(message: "left-recursion", remaining: input))
+                                                result: error)
 
             return lazyParser.value.step(packratReader).map {
                 packratReader.updateCacheAndGet(parser: lazyParser.value,

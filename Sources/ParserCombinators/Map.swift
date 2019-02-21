@@ -42,8 +42,11 @@ extension Parser {
     /// This combinator is useful when a parser depends on the result of a previous parser.
     ///
     /// - Parameters:
-    ///   - f: A function that, given the result from this parser, returns the second parser to be applied.
-    ///   - originalValue: The original result value.
+    ///   - f:
+    ///       A function that, given the result from this parser, returns the second parser
+    ///       to be applied.
+    ///   - originalValue:
+    ///       The original result value.
     ///
     public func flatMap<U>(_ f: @escaping (_ originalValue: T) -> Parser<U, Element>)
         -> Parser<U, Element>
@@ -98,9 +101,13 @@ public func ^^^ <T, U, Element>(parser: Parser<T, Element>,
 /// This combinator is useful when a parser depends on the result of a previous parser.
 ///
 /// - Parameters:
-///   - parser: The parser to be applied.
-///   - f: A function that, given the result from the first parser, returns the second parser to be applied.
-///   - originalValue: The original result value.
+///   - parser:
+///       The parser to be applied.
+///   - f:
+///       A function that, given the result from the first parser, returns the second parser
+///       to be applied.
+///   - originalValue:
+///       The original result value.
 ///
 public func >> <T, U, Element>(parser: Parser<T, Element>,
                                f: @escaping (_ originalValue: T) -> Parser<U, Element>)

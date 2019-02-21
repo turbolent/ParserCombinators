@@ -17,7 +17,9 @@ public final class StringParser: Parser<String, Character>, ExpressibleByStringL
                 let (elements, remaining) = try input.read(count: count)
                 let parsed = String(elements)
                 guard parsed == string else {
-                    return Done(.failure(message: "expected \(string) but found \(parsed)", remaining: input))
+                    return Done(.failure(message:
+                        "expected \(string) but found \(parsed)", remaining: input)
+                    )
                 }
                 return Done(.success(value: string, remaining: remaining))
             } catch ReaderError.endOfFile {
