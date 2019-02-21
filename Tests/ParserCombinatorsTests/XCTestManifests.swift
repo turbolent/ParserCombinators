@@ -16,6 +16,7 @@ extension ParserCombinatorsTests {
         ("testAccept", testAccept),
         ("testCapturing", testCapturing),
         ("testCapturing2", testCapturing2),
+        ("testCapturing3", testCapturing3),
         ("testChainLeft", testChainLeft),
         ("testCommitOr", testCommitOr),
         ("testCommitOrLongerDifferent", testCommitOrLongerDifferent),
