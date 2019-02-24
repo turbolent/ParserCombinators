@@ -15,6 +15,6 @@ extension Parser {
 /// - Parameter parser: The parser to be applied.
 ///
 public func opt<T, Element>(_ parser: Parser<T, Element>) -> Parser<T?, Element> {
-    return (parser.map { $0 } || success(nil))
+    return (parser.map { $0 }.or(success(nil)))
         .map { $0.value }
 }

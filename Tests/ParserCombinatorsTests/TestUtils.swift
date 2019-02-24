@@ -1,6 +1,7 @@
 
 import XCTest
 import ParserCombinators
+import ParserCombinatorOperators
 import DiffedAssertEqual
 
 private func parse<T>(

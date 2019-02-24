@@ -25,6 +25,7 @@ For example, a simple calculator with the grammar in BNF can be implemented as f
 ```swift
 
 import ParserCombinators
+import ParserCombinatorOperators
 
 typealias Op = (Int, Int) -> Int
 typealias OpParser = Parser<Op, Character>

@@ -1,6 +1,7 @@
 
 import XCTest
 import ParserCombinators
+import ParserCombinatorOperators
 
 
 indirect enum JSON {

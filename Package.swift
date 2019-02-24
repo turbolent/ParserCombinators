@@ -8,7 +8,11 @@ let package = Package(
         .library(
             name: "ParserCombinators",
             targets: ["ParserCombinators"]
-        )
+        ),
+        .library(
+            name: "ParserCombinatorOperators",
+            targets: ["ParserCombinatorOperators"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/turbolent/Trampoline.git", .exact("0.2.0")),
@@ -18,6 +22,10 @@ let package = Package(
         .target(
             name: "ParserCombinators",
             dependencies: ["Trampoline"]
+        ),
+        .target(
+            name: "ParserCombinatorOperators",
+            dependencies: ["ParserCombinators"]
         ),
         .testTarget(
             name: "ParserCombinatorsTests",

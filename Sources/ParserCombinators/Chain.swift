@@ -67,8 +67,9 @@ public func chainLeft<T, Element>(
              max: max.map { $0 - 1})
 
     let all: Parser<T?, Element> =
-        lazyParser.value.seq(rest)
-            ^^ { (firstAndRest: (T, [(Op, T)])) -> T in
+        lazyParser.value
+            .seq(rest)
+            .map { (firstAndRest: (T, [(Op, T)])) -> T in
                 let (first, rest) = firstAndRest
                 return rest.reduce(first) { result, opAndValue -> T in
                     let (op, value) = opAndValue
