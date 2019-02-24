@@ -29,7 +29,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ParserCombinatorsTests",
-            dependencies: ["ParserCombinators", "DiffedAssertEqual"]
+            dependencies: ["ParserCombinators", "ParserCombinatorOperators", "DiffedAssertEqual"]
         )
     ]
 )
