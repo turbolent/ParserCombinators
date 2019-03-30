@@ -82,7 +82,7 @@ extension Parser {
         -> Parser<V, Element>
         where V.Element == T
     {
-        return ParserCombinators.rep(self, separator: separator, min: min, max: max)
+        return ParserCombinators.rep(self, separator: separator(), min: min, max: max)
     }
 
     /// Creates a new parser that repeatedly applies this parser interleaved with
@@ -104,7 +104,7 @@ extension Parser {
     )
         -> Parser<V, Element>
     {
-        return ParserCombinators.rep(self, separator: separator, min: min, max: max)
+        return ParserCombinators.rep(self, separator: separator(), min: min, max: max)
     }
 }
 
@@ -204,7 +204,7 @@ public func rep<T, U: Sequenceable, Element>(
     where U.Element == T
 {
     return rep(
-        parser,
+        parser(),
         min: min,
         max: max,
         empty: { U.empty },
@@ -233,7 +233,7 @@ public func rep<T, U: AnySequenceable, Element>(
     -> Parser<U, Element>
 {
     return rep(
-        parser,
+        parser(),
         min: min,
         max: max,
         empty: { U.empty },
@@ -259,7 +259,7 @@ public func rep<T, U: Sequenceable, Element>(
     -> Parser<U, Element>
     where U.Element == T
 {
-    return rep(parser, min: n, max: n)
+    return rep(parser(), min: n, max: n)
 }
 
 /// Creates a new parser that repeatedly applies the given parser the given number of times,
@@ -279,7 +279,7 @@ public func rep<T, U: AnySequenceable, Element>(
 )
     -> Parser<U, Element>
 {
-    return rep(parser, min: n, max: n)
+    return rep(parser(), min: n, max: n)
 }
 
 /// Creates a new parser that repeatedly applies the given parser interleaved with
@@ -307,8 +307,8 @@ public func rep<T, U, V: Sequenceable, Element>(
     where V.Element == T
 {
     return rep(
-        parser,
-        separator: separator,
+        parser(),
+        separator: separator(),
         min: min,
         max: max,
         empty: { V.empty },
@@ -341,8 +341,8 @@ public func rep<T, U, V: AnySequenceable, Element>(
     -> Parser<V, Element>
 {
     return rep(
-        parser,
-        separator: separator,
+        parser(),
+        separator: separator(),
         min: min,
         max: max,
         empty: { V.empty },

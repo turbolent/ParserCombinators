@@ -62,7 +62,7 @@ extension Parser {
     public func or(_ alternative: @autoclosure @escaping () -> Parser<T, Element>)
         -> Parser<T, Element>
     {
-        return or(alternative).map { $0.value }
+        return or(alternative()).map { $0.value }
     }
 
     /// Creates a new parser that succeeds if this parser or the alternative parser succeeds.
@@ -140,7 +140,7 @@ extension Parser {
     public func orLonger(_ alternative: @autoclosure @escaping () -> Parser<T, Element>)
         -> Parser<T, Element>
     {
-        return orLonger(alternative).map { $0.value }
+        return orLonger(alternative()).map { $0.value }
     }
 }
 
@@ -160,7 +160,7 @@ public func || <T, U, Element>(first: Parser<T, Element>,
                                alternative: @autoclosure @escaping () -> Parser<U, Element>)
     -> Parser<Either<T, U>, Element>
 {
-    return first.or(alternative)
+    return first.or(alternative())
 }
 
 /// Creates a new parser that succeeds if (and only if) either when the first parser succeeds,
@@ -178,5 +178,5 @@ public func || <T, Element>(first: Parser<T, Element>,
                             alternative: @autoclosure @escaping () -> Parser<T, Element>)
     -> Parser<T, Element>
 {
-    return first.or(alternative)
+    return first.or(alternative())
 }

@@ -22,7 +22,7 @@ public func ~ <T, U, Element>(
 )
     -> Parser<(T, U), Element>
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -42,7 +42,7 @@ public func ~~ <T, U, Element>(
 )
     -> Parser<(T, U), Element>
 {
-    return first.seqTuple(second)
+    return first.seqTuple(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -62,7 +62,7 @@ public func ~ <T: Sequenceable, Element>(
 )
     -> Parser<T, Element>
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -82,7 +82,7 @@ public func ~ <T: AnySequenceable, Element>(
 )
     -> Parser<T, Element>
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -104,7 +104,7 @@ public func ~ <T: Sequenceable, U, Element>(
     -> Parser<T, Element>
     where T.Element == U
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -125,7 +125,7 @@ public func ~ <T: AnySequenceable, U, Element>(
 )
     -> Parser<T, Element>
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -146,7 +146,7 @@ public func ~ <T, U: Sequenceable, Element>(
     -> Parser<U, Element>
     where U.Element == T
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -166,7 +166,7 @@ public func ~ <T, U: AnySequenceable, Element>(
 )
     -> Parser<U, Element>
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -187,7 +187,7 @@ public func ~ <T, U: Sequenceable, Element>(
     -> Parser<U, Element>
     where U.Element == T
 {
-    return first.seq(second)
+    return first.seq(second())
 }
 
 /// Creates a new parser that applies the first parser and the second parser in sequence,
@@ -207,7 +207,7 @@ public func ~ <T, U, V, Element>(
 )
     -> Parser<(T, U, V), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.1)
     }
 }
@@ -229,7 +229,7 @@ public func ~~ <T, U, V, Element>(
 )
     -> Parser<(T, U, V), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.1)
     }
 }
@@ -251,7 +251,7 @@ public func ~ <T, U, V, W, Element>(
 )
     -> Parser<(T, U, V, W), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.1)
     }
 }
@@ -273,7 +273,7 @@ public func ~~ <T, U, V, W, Element>(
 )
     -> Parser<(T, U, V, W), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.1)
     }
 }
@@ -295,7 +295,7 @@ public func ~ <T, U, V, W, X, Element>(
 )
     -> Parser<(T, U, V, W, X), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1)
     }
 }
@@ -317,7 +317,7 @@ public func ~~ <T, U, V, W, X, Element>(
 )
     -> Parser<(T, U, V, W, X), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.1)
     }
 }
@@ -339,7 +339,7 @@ public func ~ <T, U, V, W, X, Y, Element>(
 )
     -> Parser<(T, U, V, W, X, Y), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1)
     }
 }
@@ -361,7 +361,7 @@ public func ~~ <T, U, V, W, X, Y, Element>(
 )
     -> Parser<(T, U, V, W, X, Y), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.1)
     }
 }
@@ -383,7 +383,7 @@ public func ~ <T, U, V, W, X, Y, Z, Element>(
 )
     -> Parser<(T, U, V, W, X, Y, Z), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1)
     }
 }
@@ -405,7 +405,7 @@ public func ~~ <T, U, V, W, X, Y, Z, Element>(
 )
     -> Parser<(T, U, V, W, X, Y, Z), Element>
 {
-    return first.seqTuple(second).map {
+    return first.seqTuple(second()).map {
         ($0.0.0, $0.0.1, $0.0.2, $0.0.3, $0.0.4, $0.0.5, $0.1)
     }
 }
@@ -431,7 +431,7 @@ public func ~> <T, U, Element>(
 )
     -> Parser<U, Element>
 {
-    return first.seqIgnoreLeft(second)
+    return first.seqIgnoreLeft(second())
 }
 
 infix operator <~ : ApplicativeSequencePrecedence
@@ -453,5 +453,5 @@ public func <~ <T, U, Element>(
 )
     -> Parser<T, Element>
 {
-    return first.seqIgnoreRight(second)
+    return first.seqIgnoreRight(second())
 }

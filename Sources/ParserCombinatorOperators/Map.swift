@@ -36,7 +36,7 @@ public func ^^^ <T, U, Element>(
 )
     -> Parser<U, Element>
 {
-    return parser.map(value)
+    return parser.map(value())
 }
 
 

@@ -2,7 +2,7 @@
 import Trampoline
 
 
-public class PackratReader<Element>: Reader<Element> {
+public final class PackratReader<Element>: Reader<Element> {
 
     // boxed, so that entries can be shared
     private final class Cache {

@@ -25,7 +25,7 @@ extension Parser {
         -> Parser<T?, Element>
     {
         return ParserCombinators.chainLeft(self,
-                                           separator: separator,
+                                           separator: separator(),
                                            min: min,
                                            max: max)
     }

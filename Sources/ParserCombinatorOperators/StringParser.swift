@@ -18,7 +18,7 @@ public func || (
 )
     -> Parser<String, Character>
 {
-    return StringParser(lhs) || rhs
+    return StringParser(lhs) || rhs()
 }
 
 public func || <T>(
@@ -27,7 +27,7 @@ public func || <T>(
 )
     -> Parser<Either<String, T>, Character>
 {
-    return StringParser(lhs) || rhs
+    return StringParser(lhs) || rhs()
 }
 
 
@@ -47,7 +47,7 @@ public func ||| (
 )
     -> Parser<String, Character>
 {
-    return StringParser(lhs) ||| rhs
+    return StringParser(lhs) ||| rhs()
 }
 
 public func ||| <T>(
@@ -56,7 +56,7 @@ public func ||| <T>(
 )
     -> Parser<Either<String, T>, Character>
 {
-    return StringParser(lhs) ||| rhs
+    return StringParser(lhs) ||| rhs()
 }
 
 
@@ -84,7 +84,7 @@ public func ~ <T>(
 )
     -> Parser<(String, T), Character>
 {
-    return StringParser(lhs) ~ rhs
+    return StringParser(lhs) ~ rhs()
 }
 
 public func ~ (
@@ -93,7 +93,7 @@ public func ~ (
 )
     -> Parser<[String], Character>
 {
-    return StringParser(lhs) ~ rhs
+    return StringParser(lhs) ~ rhs()
 }
 
 public func ~ (
@@ -102,7 +102,7 @@ public func ~ (
 )
     -> Parser<[String], Character>
 {
-    return StringParser(lhs) ~ rhs
+    return StringParser(lhs) ~ rhs()
 }
 
 
@@ -123,7 +123,7 @@ public func ~> <T>(
 )
     -> Parser<T, Character>
 {
-    return StringParser(lhs) ~> rhs
+    return StringParser(lhs) ~> rhs()
 }
 
 
@@ -143,7 +143,7 @@ public func <~ <T>(
 )
     -> Parser<String, Character>
 {
-    return StringParser(lhs) <~ rhs
+    return StringParser(lhs) <~ rhs()
 }
 
 
@@ -167,5 +167,5 @@ public func ^^^ <T>(
 )
     -> Parser<T, Character>
 {
-    return StringParser(lhs).map(rhs)
+    return StringParser(lhs).map(rhs())
 }

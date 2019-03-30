@@ -24,7 +24,7 @@ extension Parser {
     public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<(T, U), Element>
     {
-        return seqTuple(next)
+        return seqTuple(next())
     }
 
     /// Creates a new parser that applies this parser and the next parser in sequence,

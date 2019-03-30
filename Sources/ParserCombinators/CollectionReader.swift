@@ -1,5 +1,5 @@
 
-public class CollectionReader<C: Collection>: Reader<C.Element> {
+public final class CollectionReader<C: Collection>: Reader<C.Element> {
     private let collection: C
     private let index: C.Index
 
@@ -25,13 +25,17 @@ public class CollectionReader<C: Collection>: Reader<C.Element> {
     }
 
     public override func rest() -> CollectionReader<C> {
-        return CollectionReader(collection: collection,
-                                index: collection.index(after: index))
+        return CollectionReader(
+            collection: collection,
+            index: collection.index(after: index)
+        )
     }
 
     public override var position: Position {
-        return CollectionPosition(collection: collection,
-                                  index: index)
+        return CollectionPosition(
+            collection: collection,
+            index: index
+        )
     }
 
     public override var offset: Int {

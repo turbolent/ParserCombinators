@@ -22,7 +22,7 @@ public func ||| <T, U, Element>(
 )
     -> Parser<Either<T, U>, Element>
 {
-    return first.orLonger(alternative)
+    return first.orLonger(alternative())
 }
 
 /// Creates a new parser that succeeds if the first parser or the alternative parser succeeds.
@@ -43,5 +43,5 @@ public func ||| <T, Element>(
 )
     -> Parser<T, Element>
 {
-    return first.orLonger(alternative)
+    return first.orLonger(alternative())
 }
