@@ -36,6 +36,10 @@ extension Parser {
     public func capture(_ name: String) -> Parser<Captures, Element> {
         return map { Captures(values: [$0], entries: [name: [[$0]]]) }
     }
+
+    public func captured() -> Parser<Captures, Element> {
+        return map { Captures(value: $0) }
+    }
 }
 
 extension Parser where T == Captures {
