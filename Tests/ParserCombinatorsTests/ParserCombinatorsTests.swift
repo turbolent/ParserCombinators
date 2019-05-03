@@ -707,6 +707,28 @@ class ParserCombinatorsTests: XCTestCase {
     }
 
     func testChainLeft() {
+        let digits: Parser<String, Character> =
+            `in`(.decimalDigits, kind: "digit").rep(min: 1).stringParser
+        let separator: Parser<(String, String) -> String, Character> =
+            char(",") ^^^ { "(\($0), \($1))" }
+        let parser = chainLeft(digits, separator: separator)
+        expectSuccess(parser: parser,
+                      input: "2,3,4",
+                      expected: "((2, 3), 4)")
+    }
+
+    func testChainRight() {
+        let digits: Parser<String, Character> =
+            `in`(.decimalDigits, kind: "digit").rep(min: 1).stringParser
+        let separator: Parser<(String, String) -> String, Character> =
+            char(",") ^^^ { "(\($0), \($1))" }
+        let parser = chainRight(digits, separator: separator)
+        expectSuccess(parser: parser,
+                      input: "2,3,4",
+                      expected: "(2, (3, 4))")
+    }
+
+    func testCalculator() {
 
         typealias Op = (Int, Int) -> Int
         typealias OpParser = Parser<Op, Character>
@@ -741,6 +763,9 @@ class ParserCombinatorsTests: XCTestCase {
         expectSuccess(parser: expr,
                       input: "23+42*3",
                       expected: 149)
+        expectSuccess(parser: expr,
+                      input: "23+42*3+2",
+                      expected: 151)
     }
 
     func testLeftRecursion() {
