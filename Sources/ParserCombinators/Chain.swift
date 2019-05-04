@@ -14,7 +14,7 @@ extension Parser {
     ///       The parser that separates the occurrences of this parser. The result should
     ///       be a function that specifies how the results of this parser should be combined.
     ///   - min:
-    ///       The minumum number of times this parser needs to succeed. If the parser succeeds
+    ///       The minimum number of times this parser needs to succeed. If the parser succeeds
     ///       fewer times, the new parser returns a non-fatal failure, i.e. not an error,
     ///       and so backtracking is allowed.
     ///   - max:
@@ -43,7 +43,7 @@ extension Parser {
     ///       The parser that separates the occurrences of this parser. The result should
     ///       be a function that specifies how the results of this parser should be combined.
     ///   - min:
-    ///       The minumum number of times this parser needs to succeed. If the parser succeeds
+    ///       The minimum number of times this parser needs to succeed. If the parser succeeds
     ///       fewer times, the new parser returns a non-fatal failure, i.e. not an error,
     ///       and so backtracking is allowed.
     ///   - max:
@@ -75,7 +75,7 @@ extension Parser {
 ///       The parser that separates the occurrences of the given parser. The result should
 ///       be a function that specifies how the results of the given parser should be combined.
 ///   - min:
-///       The minumum number of times the given parser needs to succeed.
+///       The minimum number of times the given parser needs to succeed.
 ///       If the parser succeeds fewer times, the new parser returns a non-fatal failure,
 ///       i.e. not an error, and so backtracking is allowed.
 ///   - max:
@@ -131,7 +131,7 @@ public func chainLeft<T, Element>(
 ///       The parser that separates the occurrences of the given parser. The result should
 ///       be a function that specifies how the results of the given parser should be combined.
 ///   - min:
-///       The minumum number of times the given parser needs to succeed.
+///       The minimum number of times the given parser needs to succeed.
 ///       If the parser succeeds fewer times, the new parser returns a non-fatal failure,
 ///       i.e. not an error, and so backtracking is allowed.
 ///   - max:
