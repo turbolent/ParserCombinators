@@ -94,19 +94,20 @@ public func chainLeft<T, Element>(
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let rest: Parser<[(Op, T)], Element> = lazySeparator.value
-        .seq(lazyParser.value)
-        .rep(min: Swift.max(0, min - 1),
-             max: max.map { $0 - 1})
+    let rest: Parser<[(Op, T)], Element> =
+        lazySeparator.value
+            .seq(lazyParser.value)
+            .rep(min: Swift.max(0, min - 1),
+                 max: max.map { $0 - 1})
 
     let all: Parser<T?, Element> =
         lazyParser.value
             .seq(rest)
             .map { (firstAndRest: (T, [(Op, T)])) -> T in
-                let (first, rest) = firstAndRest
-                return rest.reduce(first) { result, opAndValue -> T in
+                let (firstValue, opsAndValues) = firstAndRest
+                return opsAndValues.reduce(firstValue) { resultValue, opAndValue -> T in
                     let (op, value) = opAndValue
-                    return op(result, value)
+                    return op(resultValue, value)
                 }
             }
 
@@ -150,19 +151,30 @@ public func chainRight<T, Element>(
     let lazyParser = Lazy(parser)
     let lazySeparator = Lazy(separator)
 
-    let prefix: Parser<[(T, Op)], Element> =
-        lazyParser.value
-        .seq(lazySeparator.value)
-        .rep(min: Swift.max(0, min - 1),
-             max: max.map { $0 - 1})
+    let rest: Parser<[(Op, T)], Element> =
+        lazySeparator.value
+            .seq(lazyParser.value)
+            .rep(min: Swift.max(0, min - 1),
+                 max: max.map { $0 - 1})
 
     let all: Parser<T?, Element> =
-        prefix.seq(lazyParser.value)
-            .map { (prefixAndLast: ([(T, Op)], T)) -> T in
-                let (prefix, last) = prefixAndLast
-                return prefix.reversed().reduce(last) { result, opAndValue -> T in
-                    let (value, op) = opAndValue
-                    return op(value, result)
+        lazyParser.value
+            .seq(rest)
+            .map { (firstAndRest: (T, [(Op, T)])) -> T in
+                let (firstValue, opsAndValues) = firstAndRest
+                if let lastOpAndValue = opsAndValues.last {
+                    let (op, result) = opsAndValues
+                        .dropLast()
+                        .reversed()
+                        .reduce(lastOpAndValue) {resultOpAndValue, opAndValue -> (Op, T) in
+                            let (op, result) = resultOpAndValue
+                            // NOTE: op for next combination, not this one
+                            let (nextOp, value) = opAndValue
+                            return (nextOp, op(value, result))
+                        }
+                    return op(firstValue, result)
+                } else {
+                    return firstValue
                 }
             }
 

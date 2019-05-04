@@ -599,6 +599,23 @@ class ParserCombinatorsTests: XCTestCase {
                       expected: [])
     }
 
+    func testRepFailure() {
+        let parser: Parser<[String], Character> =
+            ((char("a") ~ char("b")) ^^^ "ab").rep(min: 1)
+
+        expectSuccess(parser: parser,
+                      input: "ab",
+                      expected: ["ab"])
+        expectFailure(parser: parser,
+                      input: "a")
+        expectSuccess(parser: parser,
+                      input: "abab",
+                      expected: ["ab", "ab"])
+        expectSuccess(parser: parser <~ char("a") <~ endOfInput(),
+                      input: "aba",
+                      expected: ["ab"])
+    }
+
     func testTuples() {
         let parser =
             (char("(") ~ char(" ").rep() ~ char(")")).stringParser
@@ -707,25 +724,41 @@ class ParserCombinatorsTests: XCTestCase {
     }
 
     func testChainLeft() {
-        let digits: Parser<String, Character> =
-            `in`(.decimalDigits, kind: "digit").rep(min: 1).stringParser
+        let digit: Parser<String, Character> =
+            `in`(.decimalDigits, kind: "digit") ^^ { String($0) }
         let separator: Parser<(String, String) -> String, Character> =
             char(",") ^^^ { "(\($0), \($1))" }
-        let parser = chainLeft(digits, separator: separator)
-        expectSuccess(parser: parser,
+        let parser = chainLeft(digit, separator: separator)
+        expectSuccess(parser: parser <~ endOfInput(),
                       input: "2,3,4",
                       expected: "((2, 3), 4)")
+        expectFailure(parser: parser <~ endOfInput(),
+                      input: "2,3,")
+        expectSuccess(parser: parser <~ char("x") <~ endOfInput(),
+                      input: "2,3x",
+                      expected: "(2, 3)")
+        expectSuccess(parser: parser <~ char(",") <~ endOfInput(),
+                      input: "2,3,",
+                      expected: "(2, 3)")
     }
 
     func testChainRight() {
-        let digits: Parser<String, Character> =
-            `in`(.decimalDigits, kind: "digit").rep(min: 1).stringParser
+        let digit: Parser<String, Character> =
+            `in`(.decimalDigits, kind: "digit") ^^ { String($0) }
         let separator: Parser<(String, String) -> String, Character> =
             char(",") ^^^ { "(\($0), \($1))" }
-        let parser = chainRight(digits, separator: separator)
-        expectSuccess(parser: parser,
+        let parser = chainRight(digit, separator: separator)
+        expectSuccess(parser: parser <~ endOfInput(),
                       input: "2,3,4",
                       expected: "(2, (3, 4))")
+        expectFailure(parser: parser <~ endOfInput(),
+                      input: "2,3 ")
+        expectSuccess(parser: parser <~ char("x") <~ endOfInput(),
+                      input: "2,3x",
+                      expected: "(2, 3)")
+        expectSuccess(parser: parser <~ char(",") <~ endOfInput(),
+                      input: "2,3,",
+                      expected: "(2, 3)")
     }
 
     func testCalculator() {
