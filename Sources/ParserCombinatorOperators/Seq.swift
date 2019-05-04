@@ -56,11 +56,12 @@ public func ~~ <T, U, Element>(
 ///   - first: The parser to be applied first.
 ///   - second: The parser to be applied after the first parser suceeded.
 ///
-public func ~ <T: Sequenceable, Element>(
+public func ~ <T, Element>(
     first: Parser<T, Element>,
     second: @autoclosure @escaping () -> Parser<T, Element>
 )
     -> Parser<T, Element>
+    where T: Sequenceable
 {
     return first.seq(second())
 }
@@ -76,11 +77,12 @@ public func ~ <T: Sequenceable, Element>(
 ///   - first: The parser to be applied first.
 ///   - second: The parser to be applied after the first parser suceeded.
 ///
-public func ~ <T: AnySequenceable, Element>(
+public func ~ <T, Element>(
     first: Parser<T, Element>,
     second: @autoclosure @escaping () -> Parser<T, Element>
 )
     -> Parser<T, Element>
+    where T: AnySequenceable
 {
     return first.seq(second())
 }
@@ -97,12 +99,12 @@ public func ~ <T: AnySequenceable, Element>(
 ///   - second: The parser to be applied after the first parser suceeded.
 ///
 
-public func ~ <T: Sequenceable, U, Element>(
+public func ~ <T, U, Element>(
     first: Parser<T, Element>,
     second: @autoclosure @escaping () -> Parser<U, Element>
 )
     -> Parser<T, Element>
-    where T.Element == U
+    where T: Sequenceable, T.Element == U
 {
     return first.seq(second())
 }
@@ -119,11 +121,12 @@ public func ~ <T: Sequenceable, U, Element>(
 ///   - second: The parser to be applied after the first parser suceeded.
 ///
 
-public func ~ <T: AnySequenceable, U, Element>(
+public func ~ <T, U, Element>(
     first: Parser<T, Element>,
     second: @autoclosure @escaping () -> Parser<U, Element>
 )
     -> Parser<T, Element>
+    where T: AnySequenceable
 {
     return first.seq(second())
 }

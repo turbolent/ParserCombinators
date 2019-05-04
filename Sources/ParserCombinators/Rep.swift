@@ -15,8 +15,8 @@ extension Parser {
     ///   - max:
     ///       The maximum number of times this parser is to be applied.
     ///
-    public func rep<U: Sequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
-        where U.Element == T
+    public func rep<U>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
+        where U: Sequenceable, U.Element == T
     {
         return ParserCombinators.rep(self, min: min, max: max)
     }
@@ -32,7 +32,9 @@ extension Parser {
     ///   - max:
     ///       The maximum number of times this parser is to be applied.
     ///
-    public func rep<U: AnySequenceable>(min: Int = 0, max: Int? = nil) -> Parser<U, Element> {
+    public func rep<U>(min: Int = 0, max: Int? = nil) -> Parser<U, Element>
+        where U: AnySequenceable
+    {
         return ParserCombinators.rep(self, min: min, max: max)
     }
 
@@ -44,8 +46,8 @@ extension Parser {
     ///     If the parser succeeds fewer times, the new parser returns a non-fatal failure,
     ///     i.e. not an error, and so backtracking is allowed.
     ///
-    public func rep<U: Sequenceable>(n: Int) -> Parser<U, Element>
-        where U.Element == T
+    public func rep<U>(n: Int) -> Parser<U, Element>
+        where U: Sequenceable, U.Element == T
     {
         return ParserCombinators.rep(self, min: n, max: n)
     }
@@ -58,7 +60,9 @@ extension Parser {
     ///     If the parser succeeds fewer times, the new parser returns a non-fatal failure,
     ///     i.e. not an error, and so backtracking is allowed.
     ///
-    public func rep<U: AnySequenceable>(n: Int) -> Parser<U, Element> {
+    public func rep<U>(n: Int) -> Parser<U, Element>
+        where U: AnySequenceable
+    {
         return ParserCombinators.rep(self, min: n, max: n)
     }
 
@@ -75,12 +79,12 @@ extension Parser {
     ///   - max:
     ///       The maximum number of times this parser is to be applied.
     ///
-    public func rep<U, V: Sequenceable>(
+    public func rep<U, V>(
         separator: @autoclosure @escaping () -> Parser<U, Element>,
         min: Int = 0, max: Int? = nil
     )
         -> Parser<V, Element>
-        where V.Element == T
+        where V: Sequenceable, V.Element == T
     {
         return ParserCombinators.rep(self, separator: separator(), min: min, max: max)
     }

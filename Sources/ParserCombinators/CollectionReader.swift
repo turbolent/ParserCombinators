@@ -1,19 +1,21 @@
 
-public final class CollectionReader<C: Collection>: Reader<C.Element> {
+public final class CollectionReader<C>: Reader<C.Element>
+    where C: Collection
+{
     private let collection: C
     private let index: C.Index
 
-    public convenience init(collection: C) {
-        self.init(collection: collection,
-                  index: collection.startIndex)
-    }
-
-    public init(collection: C,
-                index: C.Index)
-    {
+    public init(collection: C, index: C.Index) {
         self.collection = collection
         self.index = index
         super.init()
+    }
+
+    public convenience init(collection: C) {
+        self.init(
+            collection: collection,
+            index: collection.startIndex
+        )
     }
 
     public override var atEnd: Bool {
@@ -39,12 +41,17 @@ public final class CollectionReader<C: Collection>: Reader<C.Element> {
     }
 
     public override var offset: Int {
-        return collection.distance(from: collection.startIndex, to: index)
+        return collection.distance(
+            from: collection.startIndex,
+            to: index
+        )
     }
 }
 
 
-public struct CollectionPosition<C: Collection>: Position {
+public struct CollectionPosition<C>: Position
+    where C: Collection
+{
     public let collection: C
     public let index: C.Index
 

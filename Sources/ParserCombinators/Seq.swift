@@ -51,9 +51,9 @@ extension Parser {
     ///
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
-    public func seq<U: Sequenceable>(_ next: @autoclosure @escaping () -> Parser<T, Element>)
+    public func seq<U>(_ next: @autoclosure @escaping () -> Parser<T, Element>)
         -> Parser<U, Element>
-        where U.Element == T
+        where U: Sequenceable, U.Element == T
     {
         return seq(Lazy(next)) {
             U.empty
@@ -71,9 +71,9 @@ extension Parser {
     ///
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
-    public func seq<U: Sequenceable>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+    public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<U, Element>
-        where U.Element == T
+        where U: Sequenceable, U.Element == T
     {
         return seq(Lazy(next)) {
             // NOTE: order
@@ -90,8 +90,9 @@ extension Parser {
     ///
     /// - Parameter next: The parser to be applied after this parser suceeded.
     ///
-    public func seq<U: AnySequenceable>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
+    public func seq<U>(_ next: @autoclosure @escaping () -> Parser<U, Element>)
         -> Parser<U, Element>
+        where U: AnySequenceable
     {
         return seq(Lazy(next)) {
             // NOTE: order
