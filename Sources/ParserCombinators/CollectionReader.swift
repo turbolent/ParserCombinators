@@ -52,16 +52,26 @@ public final class CollectionReader<C>: Reader<C.Element>
 public struct CollectionPosition<C>: Position
     where C: Collection
 {
+    public func lineContents(upToColumn column: Int?) -> String {
+        if let column = column {
+            return collection
+                .prefix(column - 1)
+                .map { String(describing: $0) + " " }
+                .joined()
+
+        } else {
+            return collection
+                .map { String(describing: $0) }
+                .joined(separator: " ")
+        }
+    }
+
     public let collection: C
     public let index: C.Index
 
     public init(collection: C, index: C.Index) {
         self.collection = collection
         self.index = index
-    }
-
-    public var lineContents: String {
-        return collection.map { String(describing: $0) }.joined()
     }
 
     public var column: Int {

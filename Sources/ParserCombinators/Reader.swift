@@ -49,7 +49,7 @@ public enum ReaderError: Error {
 
 public protocol Position: CustomStringConvertible  {
     var column: Int { get }
-    var lineContents: String { get }
+    func lineContents(upToColumn: Int?) -> String
 }
 
 
@@ -58,10 +58,13 @@ extension Position {
         return String(column)
     }
 
+    public var lineContents: String {
+        return lineContents(upToColumn: nil)
+    }
+
     public var longDescription: String {
-        let prefix = lineContents.prefix(column)
+        let prefix = lineContents(upToColumn: column)
         let space = String(prefix.map { c in c == "\t" ? c : " " })
         return lineContents + "\n\(space)^"
     }
 }
-
