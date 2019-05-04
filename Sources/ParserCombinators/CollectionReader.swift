@@ -55,6 +55,11 @@ public struct CollectionPosition<C>: Position
     public let collection: C
     public let index: C.Index
 
+    public init(collection: C, index: C.Index) {
+        self.collection = collection
+        self.index = index
+    }
+
     public var lineContents: String {
         return collection.map { String(describing: $0) }.joined()
     }
