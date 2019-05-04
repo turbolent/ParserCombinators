@@ -102,11 +102,12 @@ extension Parser {
     ///   - max:
     ///       The maximum number of times this parser is to be applied.
     ///
-    public func rep<U, V: AnySequenceable>(
+    public func rep<U, V>(
         separator: @autoclosure @escaping () -> Parser<U, Element>,
         min: Int = 0, max: Int? = nil
     )
         -> Parser<V, Element>
+        where V: AnySequenceable
     {
         return ParserCombinators.rep(self, separator: separator(), min: min, max: max)
     }
@@ -199,13 +200,13 @@ private func rep<T, U, Element>(
 ///   - max:
 ///       The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, U: Sequenceable, Element>(
+public func rep<T, U, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     min: Int = 0,
     max: Int? = nil
 )
     -> Parser<U, Element>
-    where U.Element == T
+    where U: Sequenceable, U.Element == T
 {
     return rep(
         parser(),
@@ -229,12 +230,13 @@ public func rep<T, U: Sequenceable, Element>(
 ///   - max:
 ///       The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, U: AnySequenceable, Element>(
+public func rep<T, U, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     min: Int = 0,
     max: Int? = nil
 )
     -> Parser<U, Element>
+    where U: AnySequenceable
 {
     return rep(
         parser(),
@@ -256,12 +258,12 @@ public func rep<T, U: AnySequenceable, Element>(
 ///       If the parser succeeds fewer times, the new parser returns a non-fatal failure,
 ///       i.e. not an error, and so backtracking is allowed.
 ///
-public func rep<T, U: Sequenceable, Element>(
+public func rep<T, U, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     n: Int
 )
     -> Parser<U, Element>
-    where U.Element == T
+    where U: Sequenceable, U.Element == T
 {
     return rep(parser(), min: n, max: n)
 }
@@ -277,11 +279,12 @@ public func rep<T, U: Sequenceable, Element>(
 ///       If the parser succeeds fewer times, the new parser returns a non-fatal failure,
 ///       i.e. not an error, and so backtracking is allowed.
 ///
-public func rep<T, U: AnySequenceable, Element>(
+public func rep<T, U, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     n: Int
 )
     -> Parser<U, Element>
+    where U: AnySequenceable
 {
     return rep(parser(), min: n, max: n)
 }
@@ -301,14 +304,14 @@ public func rep<T, U: AnySequenceable, Element>(
 ///   - max:
 ///       The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, U, V: Sequenceable, Element>(
+public func rep<T, U, V, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     separator: @autoclosure @escaping () -> Parser<U, Element>,
     min: Int = 0,
     max: Int? = nil
 )
     -> Parser<V, Element>
-    where V.Element == T
+    where V: Sequenceable, V.Element == T
 {
     return rep(
         parser(),
@@ -336,13 +339,14 @@ public func rep<T, U, V: Sequenceable, Element>(
 ///   - max:
 ///       The maximum number of times the given parser is to be applied.
 ///
-public func rep<T, U, V: AnySequenceable, Element>(
+public func rep<T, U, V, Element>(
     _ parser: @autoclosure @escaping () -> Parser<T, Element>,
     separator: @autoclosure @escaping () -> Parser<U, Element>,
     min: Int = 0,
     max: Int? = nil
 )
     -> Parser<V, Element>
+    where V: AnySequenceable
 {
     return rep(
         parser(),
