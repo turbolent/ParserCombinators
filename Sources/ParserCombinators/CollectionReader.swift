@@ -1,11 +1,11 @@
 
-public final class CollectionReader<C>: Reader<C.Element>
+public class CollectionReader<C>: Reader<C.Element>
     where C: Collection
 {
     private let collection: C
     private let index: C.Index
 
-    public init(collection: C, index: C.Index) {
+    public required init(collection: C, index: C.Index) {
         self.collection = collection
         self.index = index
         super.init()
@@ -26,8 +26,8 @@ public final class CollectionReader<C>: Reader<C.Element>
         return collection[index]
     }
 
-    public override func rest() -> CollectionReader<C> {
-        return CollectionReader(
+    public override func rest() -> Self {
+        return type(of: self).init(
             collection: collection,
             index: collection.index(after: index)
         )
