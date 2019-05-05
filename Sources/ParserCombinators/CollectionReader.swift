@@ -1,5 +1,5 @@
 
-public class CollectionReader<C>: Reader<C.Element>
+open class CollectionReader<C>: Reader<C.Element>
     where C: Collection
 {
     private let collection: C

@@ -2,7 +2,7 @@
 import Foundation
 
 
-public class Reader<Element> {
+open class Reader<Element> {
 
     internal init() {}
 
